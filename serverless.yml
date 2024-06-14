@@ -1,0 +1,44 @@
+	
+# serverless.yml
+ 
+service: fruit-project-api-scraper
+
+plugins:
+  - serverless-python-requirements
+ 
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
+params:
+  default:
+    table1: 'fruit'
+    table2: 'cocktail-recipes'
+    table:2: 'food-recipes'
+
+provider:
+  name: aws
+  runtime: python3.6
+  iam:
+    role:
+      name: fruit-project-api-scraper-lambda-role
+      statements:
+        - Effect: "Allow"
+          Action:
+          - dynamodb:DescribeTable
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          Resource: 
+            - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table1}
+            - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table2}
+            - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table3}
+ 
+functions:
+  fruit-project-api-scraper:
+    handler: handler.main
+
+

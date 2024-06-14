@@ -11,6 +11,4 @@ src/tests/.pytests_cache
 src/tests/.pytests_cache/*
 execute.sh
 package-lock.json
-package.json
-serverless.yml
 node_modules

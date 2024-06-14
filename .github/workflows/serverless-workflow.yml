@@ -9,6 +9,11 @@ on:
       - 'src/*'
       - '.github/workflows/serverless-workflow.yml'
 
+env:
+  TEST_DIR: "src/tests"
+  PYTHON_VERSION: 3.11
+  NODE_VERSION: 20:14
+
 jobs:
   pytest:
     name: "Pytests"
@@ -16,9 +21,9 @@ jobs:
     strategy:  
       matrix:  
         test_file: ["api_mapping_manager", "record_manager", "scraper", "utils"]
-    env:
-      TEST_DIR: "src/tests"
-      PYTHON_VERSION: 3.11
+    # env:
+    #   TEST_DIR: "src/tests"
+    #   PYTHON_VERSION: 3.11
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python version - ${{ env.PYTHON_VERSION }}
@@ -35,3 +40,22 @@ jobs:
       continue-on-error: true
     - name: Test with pytest
       run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
+  deploy:
+    name: deploy
+    needs: pytest
+    runs-on: ubuntu-latest
+    env: 
+      node-version: 20:14
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - run: npm ci
+    - name: serverless deploy
+      uses: serverless/github-action@v3.2
+      with:
+        args: deploy
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}

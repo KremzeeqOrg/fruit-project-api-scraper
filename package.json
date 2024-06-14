@@ -1,0 +1,14 @@
+{
+  "name": "fruit-project-api-scraper",
+  "version": "1.0.0",
+  "description": "Python API scraper designed to be deployed as a AWS lambda, to support a ETL workflow. It extracts api-specific config from AWS parameter store and then based on that, it scrapes records from an external target API. It then transforms the data so that only desired fields are kept and a timestamp is added for each record. All records are then uploaded to a table in DynamoDB.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serverless-python-requirements": "^6.1.0"
+  }
+}
