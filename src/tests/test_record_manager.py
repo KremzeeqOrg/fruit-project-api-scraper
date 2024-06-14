@@ -42,7 +42,7 @@ def target_api_1_record_batch():
     return records
 
 @pytest.fixture
-def target_api_1_delete_requests_record_batch():
+def target_api_1_delete_request_record_batch():
    return [{'DeleteRequest': {'Key': {'name': 'Persimmon'}}}, {'DeleteRequest': {'Key': {'name': 'Strawberry'}}}]
 
 @pytest.fixture
@@ -131,10 +131,10 @@ class TestRecordManager:
        expected_dict = target_api_1_put_request_record_batch[0]
        assert expected_dict == request_dict
 
-    def test_get_batch_items_for_delete_request_type(self, target_api_1_record_manager, target_api_1_record_batch):
+    def test_get_batch_items_for_delete_request_type(self, target_api_1_record_manager, target_api_1_record_batch, target_api_1_delete_request_record_batch):
        batch_items = target_api_1_record_manager.get_batch_items(target_api_1_record_batch, "delete")
-       assert batch_items == target_api_1_record_batch
-  
+       assert batch_items == target_api_1_delete_request_record_batch
+       
     def test_get_batch_items_for_put_request_type(self, target_api_1_record_manager, target_api_1_record_batch, target_api_1_put_request_record_batch):
        batch_items = target_api_1_record_manager.get_batch_items(target_api_1_record_batch, "put")
        assert batch_items == target_api_1_put_request_record_batch
