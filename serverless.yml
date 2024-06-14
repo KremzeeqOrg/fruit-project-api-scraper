@@ -2,17 +2,12 @@
 # serverless.yml
  
 service: fruit-project-api-scraper
+frameworkVersion: '3'
 
 plugins:
   - serverless-python-requirements
   - serverless-prune-plugin
  
-custom:
-  pythonRequirements:
-    pythonBin: /opt/python3.11/bin/python
-  prune:
-    automatic: true
-    number: 3
 
 
 params:
@@ -55,5 +50,13 @@ provider:
 functions:
   fruit-project-api-scraper:
     handler: handler.main
-
+    package:
+      patterns:
+        -  "!node_modules/**"
+custom:
+  pythonRequirements:
+    pythonBin: /opt/python3.11/bin/python
+  prune:
+    automatic: true
+    number: 3
 
