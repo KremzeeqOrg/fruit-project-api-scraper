@@ -42,6 +42,9 @@ jobs:
     - name: Test with pytest
       run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
   deploy:
+    permissions:
+      id-token: write
+      contents: read
     name: deploy
     needs: pytest
     runs-on: ubuntu-latest
