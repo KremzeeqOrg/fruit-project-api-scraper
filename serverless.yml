@@ -5,10 +5,15 @@ service: fruit-project-api-scraper
 
 plugins:
   - serverless-python-requirements
+  - serverless-prune-plugin
  
 custom:
   pythonRequirements:
     dockerizePip: non-linux
+  prune:
+    automatic: true
+    number: 3
+
 
 params:
   default:
@@ -18,7 +23,19 @@ params:
 
 provider:
   name: aws
-  runtime: python3.6
+  runtime: python3.11
+  region: eu-west-2
+  runtimeManagement: auto
+  memorySize: 512
+  timout: 10
+  environment:
+    APP: "fruit-project-api-scraper"
+    SOURCE_API_NAME: "fruity-vice"
+  logRetentionInDays: 14  	
+  lambdaHashingVersion: 20201221
+
+  custom:
+
   iam:
     role:
       name: fruit-project-api-scraper-lambda-role

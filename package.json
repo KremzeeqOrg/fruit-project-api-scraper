@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "serverless-python-requirements": "^6.1.0"
+    "serverless-python-requirements": "^6.1.0",
+    "serverless-prune-plugin": "^2.0.2"
   }
 }
