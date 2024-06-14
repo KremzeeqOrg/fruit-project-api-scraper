@@ -79,7 +79,7 @@ class RecordManager:
       for x in range(1,ingredient_max_count+1):
         ingredient_key=f"ingredient_{x}"
         measure_key=f"measure_{x}"
-        if api_record[ingredient_key] == None or api_record[ingredient_key] == '':
+        if api_record[ingredient_key] is None or api_record[ingredient_key] == '':
             api_record.pop(ingredient_key)
             api_record.pop(measure_key)
         else:
@@ -162,9 +162,9 @@ class RecordManager:
     for record_batch in record_batches:
       print(f'Batch: {counter}')
       batch_items = self.get_batch_items(record_batch, "delete")
-      response = self.upload_batch_to_dynamo_db(dynamo_db_resource, batch_items)
+      self.upload_batch_to_dynamo_db(dynamo_db_resource, batch_items)
       batch_items = self.get_batch_items(record_batch, "put")
-      response = self.upload_batch_to_dynamo_db(dynamo_db_resource, batch_items)
+      self.upload_batch_to_dynamo_db(dynamo_db_resource, batch_items)
       # print(response)
       counter += 1
       print({"Batch uploaded"})

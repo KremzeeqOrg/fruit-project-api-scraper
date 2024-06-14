@@ -52,7 +52,7 @@ def validate_timestamp(timestamp):
     datetime.strptime(timestamp, format)
     return timestamp
   except ValueError as e:
-    raise Exception("Error: {e} - timestamp is not valid")
+    raise Exception(f"Error: {e} - timestamp is not valid")
   
 def validate_api_records(api_records):
   try:

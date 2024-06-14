@@ -13,5 +13,4 @@ execute.sh
 package-lock.json
 package.json
 serverless.yml
-.github
 node_modules
