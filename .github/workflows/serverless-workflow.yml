@@ -13,6 +13,7 @@ env:
   TEST_DIR: "src/tests"
   PYTHON_VERSION: 3.11
   NODE_VERSION: 20:14
+  AWS_REGION: "eu-west-2"
 
 jobs:
   pytest:
@@ -45,14 +46,21 @@ jobs:
     needs: pytest
     runs-on: ubuntu-latest
     env: 
-      node-version: 20:14
+      node-version: 20
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - run: npm ci
+
+    - name: Set AWS context
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE }}
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ env.AWS_REGION }}
+        mask-aws-account-id: true
     - name: serverless deploy
       uses: serverless/github-action@v3.2
       with:
