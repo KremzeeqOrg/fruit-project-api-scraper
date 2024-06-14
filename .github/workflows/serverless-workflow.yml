@@ -17,14 +17,11 @@ env:
 
 jobs:
   pytest:
-    name: "Pytests"
+    name: "Pytest"
     runs-on: ubuntu-latest
     strategy:  
       matrix:  
         test_file: ["api_mapping_manager", "record_manager", "scraper", "utils"]
-    # env:
-    #   TEST_DIR: "src/tests"
-    #   PYTHON_VERSION: 3.11
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python version - ${{ env.PYTHON_VERSION }}
@@ -54,7 +51,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-
+    - name: Set up Python version - ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
       with:
