@@ -12,7 +12,7 @@ on:
 env:
   TEST_DIR: "src/tests"
   PYTHON_VERSION: 3.11
-  NODE_VERSION: 20:14
+  NODE_VERSION: 20
   AWS_REGION: "eu-west-2"
 
 jobs:
@@ -45,8 +45,6 @@ jobs:
     name: deploy
     needs: pytest
     runs-on: ubuntu-latest
-    env: 
-      node-version: 20
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ env.NODE_VERSION }}
