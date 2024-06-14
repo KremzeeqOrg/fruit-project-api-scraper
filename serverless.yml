@@ -27,7 +27,7 @@ provider:
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
-  timout: 10
+  timeout: 10
   environment:
     APP: "fruit-project-api-scraper"
     SOURCE_API_NAME: "fruity-vice"
