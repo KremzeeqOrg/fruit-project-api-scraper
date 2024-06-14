@@ -121,9 +121,9 @@ class TestRecordManager:
         record_batches = target_api_1_record_manager.get_record_batches(api_records, 25)
         assert isinstance(record_batches, types.GeneratorType)
     
-    def test_get_dynamo_db_delete_request_dict(self, target_api_1_record_manager, target_api_1_records, target_api_1_delete_requests_record_batch):
+    def test_get_dynamo_db_delete_request_dict(self, target_api_1_record_manager, target_api_1_records, target_api_1_delete_request_record_batch):
        request_dict = target_api_1_record_manager.get_dynamo_db_delete_request_dict(target_api_1_records[0])
-       assert target_api_1_delete_requests_record_batch[0] == request_dict
+       assert target_api_1_delete_request_record_batch[0] == request_dict
 
     def test_get_dynamo_db_put_request_dict(self, target_api_1_record_manager, target_api_1_records, target_api_1_put_request_record_batch):
        target_api_1_records[0].pop('nutritions')
@@ -134,13 +134,13 @@ class TestRecordManager:
     def test_get_batch_items_for_delete_request_type(self, target_api_1_record_manager, target_api_1_record_batch, target_api_1_delete_request_record_batch):
        batch_items = target_api_1_record_manager.get_batch_items(target_api_1_record_batch, "delete")
        assert batch_items == target_api_1_delete_request_record_batch
-       
+
     def test_get_batch_items_for_put_request_type(self, target_api_1_record_manager, target_api_1_record_batch, target_api_1_put_request_record_batch):
        batch_items = target_api_1_record_manager.get_batch_items(target_api_1_record_batch, "put")
        assert batch_items == target_api_1_put_request_record_batch
 
     @mock_aws
-    def test_upload_batch_to_dynamo_db(self, target_api_1_record_manager, target_api_1_delete_requests_record_batch):
+    def test_upload_batch_to_dynamo_db(self, target_api_1_record_manager, target_api_1_delete_request_record_batch):
        dynamo_db_resource = boto3.resource('dynamodb', region_name = REGION)
        dynamo_db_resource.create_table(
           TableName = TARGET_DYNAMO_DB_TABLE_NAME,
@@ -158,6 +158,6 @@ class TestRecordManager:
           BillingMode='PAY_PER_REQUEST'
        )
        target_api_1_record_manager.dynamo_db_table = TARGET_DYNAMO_DB_TABLE_NAME
-       response = target_api_1_record_manager.upload_batch_to_dynamo_db(dynamo_db_resource, target_api_1_delete_requests_record_batch)
+       response = target_api_1_record_manager.upload_batch_to_dynamo_db(dynamo_db_resource, target_api_1_delete_request_record_batch)
        assert response["ResponseMetadata"]["HTTPStatusCode"] == 200
 
