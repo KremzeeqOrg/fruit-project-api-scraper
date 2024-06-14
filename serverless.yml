@@ -63,7 +63,7 @@ functions:
 
 custom:
   pythonRequirements:
-    pythonBin: /opt/python3.11/bin/python
+    pythonBin: /opt/python3.10/bin/python
   prune:
     automatic: true
     number: 3
