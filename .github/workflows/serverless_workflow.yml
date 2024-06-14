@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - '**.tf'
+      - 'src/*'
       - '.github/workflows/serverless-workflow.yml'
 
 jobs:
