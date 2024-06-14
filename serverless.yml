@@ -14,7 +14,7 @@ params:
   default:
     table1: 'fruit'
     table2: 'cocktail-recipes'
-    table:2: 'food-recipes'
+    table:3: 'food-recipes'
 
 provider:
   name: aws
