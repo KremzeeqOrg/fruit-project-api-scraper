@@ -18,7 +18,7 @@ params:
 
 provider:
   name: aws
-  runtime: python3.11
+  runtime: python3.10
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
@@ -51,8 +51,16 @@ functions:
   fruit-project-api-scraper:
     handler: handler.main
     package:
-      patterns:
-        -  "!node_modules/**"
+      exclude:
+      - node_modules/**
+      - .idea/**
+      - .requirements/**
+      - env/**
+      - README.md
+      - package.json
+      - package-lock.json
+      - requirements.txt
+
 custom:
   pythonRequirements:
     pythonBin: /opt/python3.11/bin/python
