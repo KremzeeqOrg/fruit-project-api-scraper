@@ -43,9 +43,9 @@ provider:
           - dynamodb:UpdateItem
           - dynamodb:DeleteItem
           Resource: 
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table1}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table2}
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table3}
+            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table1}
+            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table2}
+            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table3}
  
 functions:
   fruit-project-api-scraper:
