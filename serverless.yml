@@ -12,6 +12,7 @@ params:
     table1: 'fruit'
     table2: 'cocktail-recipes'
     table3: 'food-recipes'
+    app: 'fruit-project-api-scraper'
 
 provider:
   name: aws
@@ -21,7 +22,7 @@ provider:
   memorySize: 512
   timeout: 10
   environment:
-    APP: "fruit-project-api-scraper"
+    APP: ${param:app}
     SOURCE_API_NAME: "fruity-vice"
 
 
@@ -33,11 +34,11 @@ images:
 
 functions:
   fruit-project-api-scraper:
-    image: ${env.APP}:latest
+    image: ${param:table3}:latest
     # image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${env.APP}:latest
 iam:
   role:
-    name: ${env:APP}-lambda-role
+    name: ${param:app}-lambda-role
     statements:
       - Effect: "Allow"
         Action:
