@@ -33,7 +33,7 @@ images:
 
 functions:
   fruit-project-api-scraper:
-    image: ${env.APP}:latest
+    image: fruit-project-api-scraper:latest
 iam:
   role:
     name: ${env:APP}-lambda-role
