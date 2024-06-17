@@ -5,11 +5,8 @@ service: fruit-project-api-scraper
 frameworkVersion: '3'
 
 plugins:
-  - serverless-python-requirements
   - serverless-prune-plugin
  
-
-
 params:
   default:
     table1: 'fruit'
@@ -26,46 +23,29 @@ provider:
   environment:
     APP: "fruit-project-api-scraper"
     SOURCE_API_NAME: "fruity-vice"
-  logRetentionInDays: 14  	
-  lambdaHashingVersion: 20201221
 
-  iam:
-    role:
-      name: fruit-project-api-scraper-lambda-role
-      statements:
-        - Effect: "Allow"
-          Action:
-          - dynamodb:DescribeTable
-          - dynamodb:Query
-          - dynamodb:Scan
-          - dynamodb:GetItem
-          - dynamodb:PutItem
-          - dynamodb:UpdateItem
-          - dynamodb:DeleteItem
-          Resource: 
-            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table1}
-            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table2}
-            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table3}
- 
 functions:
   fruit-project-api-scraper:
-    handler: src/handler.main
-    package:
-      exclude:
-      - node_modules/**
-      - .idea/**
-      - .requirements/**
-      - env/**
-      - README.md
-      - package.json
-      - package-lock.json
-      - requirements.txt
+    image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${env:APP}:latest
+iam:
+  role:
+    name: ${env:APP}-lambda-role
+    statements:
+      - Effect: "Allow"
+        Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        Resource: 
+          - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table1}
+          - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table2}
+          - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table3}
 
 custom:
-  pythonRequirements:
-    zip: true
-    # pythonBin: /opt/python3.10/bin/python
   prune:
     automatic: true
     number: 3
-
