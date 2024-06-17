@@ -1,12 +1,11 @@
-	
 # serverless.yml
- 
+
 service: fruit-project-api-scraper
 frameworkVersion: '3'
 
 plugins:
   - serverless-prune-plugin
- 
+
 params:
   default:
     table1: 'fruit'
@@ -24,36 +23,31 @@ provider:
   environment:
     APP: ${param:app}
     SOURCE_API_NAME: "fruity-vice"
-
-
-
-ecr:
-  images:
-    fruit-project-api-scraper:
-      path: ./
+  ecr:
+    images:
+      fruit-project-api-scraper:
+        path: ./
+  iam:
+    role:
+      name: ${param:app}-lambda-role
+      statements:
+        - Effect: "Allow"
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table1}
+            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table2}
+            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table3}
 
 functions:
   fruit-project-api-scraper:
-    image: ${param:app}:latest
-    # image: .dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
-    # image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${env.APP}:latest
-iam:
-  role:
-    name: ${param:app}-lambda-role
-    statements:
-      - Effect: "Allow"
-        Action:
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-        Resource: 
-          - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table1}
-          - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table2}
-          - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table3}
+    image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
 
 custom:
   prune:
