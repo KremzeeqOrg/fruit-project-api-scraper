@@ -63,10 +63,11 @@ jobs:
     - name: "Docker Build and push to AWS ECR"
       env:
         AWS_ECR: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
-        IMAGE_NAME: ${{ env.APP }}:${{ github.sha }}
+        IMAGE_SHA_TAG: ${{ env.APP }}:${{ github.sha }}
+        IMAGE_LATEST_TAG: ${{ env.APP }}:latest
       run: |
-        docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}/${{ env.IMAGE_NAME }} .
-        docker push ${{ env.AWS_ECR }}/${{ env.IMAGE_NAME }}
+        docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}/${{ env.IMAGE_SHA_TAG }} -t ${{ env.AWS_ECR }}/${{ env.IMAGE_LATEST_TAG }} .
+        docker push ${{ env.AWS_ECR }}/${{ env.APP }} --all-tags
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v4
       with:
