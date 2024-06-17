@@ -76,10 +76,12 @@ jobs:
       # if: github.ref != 'refs/heads/main'
       run: |
         npm i -g serverless
+        serverless login
         npm install && npm list -g && serverless package --package .serverless.${{ env.ENV }} --verbose
 
     - name: serverless deploy
       # if: github.ref == 'refs/heads/main'
       run: | 
+        npm i -g serverless
+        serverless login
         serverless deploy --package .serverless.${{ env.ENV }} --verbose
-        entrypoint: /bin/bash
