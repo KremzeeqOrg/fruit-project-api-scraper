@@ -20,7 +20,7 @@ provider:
   ecr:
     images:
       fruitProjectApiScraper:
-        path: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
+        uri: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
