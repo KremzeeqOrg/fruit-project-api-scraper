@@ -3,8 +3,8 @@
 service: fruit-project-api-scraper
 frameworkVersion: '3'
 
-# plugins:
-#   - serverless-prune-plugin
+plugins:
+  - serverless-prune-plugin
 
 params:
   default:
@@ -50,7 +50,7 @@ functions:
   fruit-project-api-scraper:
     image: fruit-project-api-scraper
 
-# custom:
-#   prune:
-#     automatic: true
-#     number: 3
+custom:
+  prune:
+    automatic: true
+    number: 3
