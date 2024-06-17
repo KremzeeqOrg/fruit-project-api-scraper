@@ -33,7 +33,7 @@ images:
 
 functions:
   fruit-project-api-scraper:
-    image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${env:APP}:latest
+    image: ${env.APP}:latest
 iam:
   role:
     name: ${env:APP}-lambda-role
