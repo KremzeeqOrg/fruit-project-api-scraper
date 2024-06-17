@@ -26,7 +26,7 @@ provider:
   ecr:
     images:
       fruit-project-api-scraper:
-        path: ./
+        uri: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
   iam:
     role:
       name: ${param:app}-lambda-role
@@ -47,7 +47,8 @@ provider:
 
 functions:
   fruit-project-api-scraper:
-    image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
+    #image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
+    image:  ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
 
 custom:
   prune:
