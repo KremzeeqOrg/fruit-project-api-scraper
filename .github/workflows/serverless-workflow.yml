@@ -56,13 +56,17 @@ jobs:
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
         aws-region: ${{ env.AWS_REGION }}
         mask-aws-account-id: true
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
+        mask-password: 'true'
     - name: "Docker Build and push to AWS ECR"
-      run: |
-        docker login --username AWS --password-stdin ${{ env.AWS_ECR }}
-        docker build --platform linux/amd64 -t ${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }} .
-        docker push ${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}
+      env:
         AWS_ECR: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
-        IMAGE_NAME: ${{ env.APP }}:latest
+        IMAGE_NAME: ${{ env.APP }}:${{ github.sha }}
+      run: |
+        docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}/${{ env.IMAGE_NAME }} .
+        docker push ${{ env.AWS_ECR }}/${{ env.IMAGE_NAME }}
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v4
       with:
@@ -84,5 +88,3 @@ jobs:
         entrypoint: /bin/bash
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-
-
