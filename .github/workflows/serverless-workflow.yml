@@ -40,7 +40,7 @@ jobs:
   #     continue-on-error: true
   #   - name: Test with pytest
   #     run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
-  sls-package-and-deploy:
+  sls-deploy:
     permissions:
       id-token: write
       contents: read
@@ -73,7 +73,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
     - name: serverless deploy
-      if: github.ref == 'refs/heads/main'
+      # if: github.ref == 'refs/heads/main'
       run: | 
         npm i -g serverless@3.2
         npm install && npm list -g
