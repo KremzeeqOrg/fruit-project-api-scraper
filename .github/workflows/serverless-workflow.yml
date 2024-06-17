@@ -65,7 +65,7 @@ jobs:
         mask-aws-account-id: true
     - name: serverless package
       # close to dry run. Packages entire infrastructure defined as per serverless.yml
-      run: npm install && && npm list && serverless package --stage ${{ env.SLS_STAGE }} --region ${{ env.AWS_REGION }} --package .serverless.${{ env.SLS_STAGE }}
+      run: npm install && npm list && serverless package --stage ${{ env.SLS_STAGE }} --region ${{ env.AWS_REGION }} --package .serverless.${{ env.SLS_STAGE }}
     # - name: serverless deploy
     #   # if: github.ref != 'refs/heads/main'
     #   uses: serverless/github-action@v3.2
