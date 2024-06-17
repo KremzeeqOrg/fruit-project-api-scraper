@@ -24,6 +24,13 @@ provider:
     APP: "fruit-project-api-scraper"
     SOURCE_API_NAME: "fruity-vice"
 
+
+
+ecr:
+images:
+  fruit-project-api-scraper:
+    path: ./
+
 functions:
   fruit-project-api-scraper:
     image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${env:APP}:latest
