@@ -3,8 +3,8 @@
 service: fruit-project-api-scraper
 frameworkVersion: '3'
 
-plugins:
-  - serverless-prune-plugin
+# plugins:
+#   - serverless-prune-plugin
 
 params:
   default:
@@ -16,6 +16,10 @@ params:
 provider:
   name: aws
   runtime: python3.10
+  ecr:
+    images:
+      fruit-project-api-scraper:
+        path: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
@@ -23,10 +27,7 @@ provider:
   environment:
     APP: ${param:app}
     SOURCE_API_NAME: "fruity-vice"
-  ecr:
-    images:
-      fruit-project-api-scraper:
-        uri: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
+
   iam:
     role:
       name: ${param:app}-lambda-role
@@ -47,10 +48,9 @@ provider:
 
 functions:
   fruit-project-api-scraper:
-    #image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
-    image:  ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
+    image: fruit-project-api-scraper
 
-custom:
-  prune:
-    automatic: true
-    number: 3
+# custom:
+#   prune:
+#     automatic: true
+#     number: 3

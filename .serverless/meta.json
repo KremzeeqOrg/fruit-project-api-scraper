@@ -1,0 +1,230 @@
+{
+  "unknown": {
+    "versionSfCore": null,
+    "versionFramework": "4.1.4",
+    "isWithinCompose": false,
+    "composeOrgName": null,
+    "composeServiceName": null,
+    "command": [
+      "login"
+    ],
+    "options": {},
+    "error": null,
+    "machineId": "7f3d201331b8ed14d6c062da6711c6e6",
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  },
+  "/home/crimzee/Documents/fruit_project/fruit_project_foundations/fruit-project-api-scraper": {
+    "versionSfCore": null,
+    "versionFramework": "4.1.4",
+    "isWithinCompose": false,
+    "isCompose": false,
+    "composeOrgName": null,
+    "composeResolverProviders": {
+      "param": {
+        "instance": {
+          "credentials": "<REDACTED>",
+          "serviceConfigFile": {
+            "service": "fruit-project-api-scraper",
+            "frameworkVersion": "4",
+            "params": {
+              "default": {
+                "table1": "fruit",
+                "table2": "cocktail-recipes",
+                "table3": "food-recipes",
+                "app": "fruit-project-api-scraper"
+              }
+            },
+            "provider": {
+              "name": "aws",
+              "runtime": "python3.10",
+              "region": "eu-west-2",
+              "runtimeManagement": "auto",
+              "memorySize": 512,
+              "timeout": 10,
+              "environment": {
+                "APP": "fruit-project-api-scraper",
+                "SOURCE_API_NAME": "fruity-vice"
+              },
+              "ecr": {
+                "images": {
+                  "fruit-project-api-scraper": {
+                    "uri": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/fruit-project-api-scraper:latest"
+                  }
+                }
+              },
+              "iam": {
+                "role": {
+                  "name": "fruit-project-api-scraper-lambda-role",
+                  "statements": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "dynamodb:DescribeTable",
+                        "dynamodb:Query",
+                        "dynamodb:Scan",
+                        "dynamodb:GetItem",
+                        "dynamodb:PutItem",
+                        "dynamodb:UpdateItem",
+                        "dynamodb:DeleteItem"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:fruit"
+                        },
+                        {
+                          "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:cocktail-recipes"
+                        },
+                        {
+                          "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:food-recipes"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "stage": "dev",
+              "versionFunctions": true
+            },
+            "functions": {
+              "fruit-project-api-scraper": {
+                "image": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/fruit-project-api-scraper:latest"
+              }
+            }
+          },
+          "configFileDirPath": "/home/crimzee/Documents/fruit_project/fruit_project_foundations/fruit-project-api-scraper",
+          "config": {
+            "type": "param"
+          },
+          "options": {},
+          "stage": "dev",
+          "dashboard": null
+        },
+        "resolvers": {}
+      }
+    },
+    "composeServiceName": null,
+    "servicePath": "/home/crimzee/Documents/fruit_project/fruit_project_foundations/fruit-project-api-scraper",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "fruit-project-api-scraper",
+      "frameworkVersion": "4",
+      "params": {
+        "default": {
+          "table1": "fruit",
+          "table2": "cocktail-recipes",
+          "table3": "food-recipes",
+          "app": "fruit-project-api-scraper"
+        }
+      },
+      "provider": {
+        "name": "aws",
+        "runtime": "python3.10",
+        "region": "eu-west-2",
+        "runtimeManagement": "auto",
+        "memorySize": 512,
+        "timeout": 10,
+        "environment": {
+          "APP": "fruit-project-api-scraper",
+          "SOURCE_API_NAME": "fruity-vice"
+        },
+        "ecr": {
+          "images": {
+            "fruit-project-api-scraper": {
+              "uri": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/fruit-project-api-scraper:latest"
+            }
+          }
+        },
+        "iam": {
+          "role": {
+            "name": "fruit-project-api-scraper-lambda-role",
+            "statements": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:DescribeTable",
+                  "dynamodb:Query",
+                  "dynamodb:Scan",
+                  "dynamodb:GetItem",
+                  "dynamodb:PutItem",
+                  "dynamodb:UpdateItem",
+                  "dynamodb:DeleteItem"
+                ],
+                "Resource": [
+                  {
+                    "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:fruit"
+                  },
+                  {
+                    "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:cocktail-recipes"
+                  },
+                  {
+                    "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:food-recipes"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "stage": "dev",
+        "versionFunctions": true
+      },
+      "functions": {
+        "fruit-project-api-scraper": {
+          "image": "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/fruit-project-api-scraper:latest"
+        }
+      }
+    },
+    "serviceRawFile": "# serverless.yml\n\nservice: fruit-project-api-scraper\nframeworkVersion: '4'\n\n# plugins:\n#   - serverless-prune-plugin\n\nparams:\n  default:\n    table1: 'fruit'\n    table2: 'cocktail-recipes'\n    table3: 'food-recipes'\n    app: 'fruit-project-api-scraper'\n\nprovider:\n  name: aws\n  runtime: python3.10\n  region: eu-west-2\n  runtimeManagement: auto\n  memorySize: 512\n  timeout: 10\n  environment:\n    APP: ${param:app}\n    SOURCE_API_NAME: \"fruity-vice\"\n  ecr:\n    images:\n      fruit-project-api-scraper:\n        uri: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest\n  iam:\n    role:\n      name: ${param:app}-lambda-role\n      statements:\n        - Effect: \"Allow\"\n          Action:\n            - dynamodb:DescribeTable\n            - dynamodb:Query\n            - dynamodb:Scan\n            - dynamodb:GetItem\n            - dynamodb:PutItem\n            - dynamodb:UpdateItem\n            - dynamodb:DeleteItem\n          Resource:\n            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table1}\n            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table2}\n            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table3}\n\nfunctions:\n  fruit-project-api-scraper:\n    image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest\n\n# custom:\n#   prune:\n#     automatic: true\n#     number: 3",
+    "command": [
+      "doctor"
+    ],
+    "options": {},
+    "error": {
+      "message": "Provider AWS is not supported. Please change Provider \"AWS\" to \"aws\"",
+      "stack": "Error: Provider AWS is not supported. Please change Provider \"AWS\" to \"aws\"\n    at createResolverProvider (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1034:1905)\n    at #addResolverProvider (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1065:46173)\n    at #handleProviderNode (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1065:46627)\n    at file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1065:45347\n    at processNodeAndHandleCompletion (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1065:38405)\n    at processNodeAndManagePromise (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1065:39041)\n    at file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1065:38858\n    at Array.forEach (<anonymous>)\n    at processSinks (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1065:38813)\n    at processGraphInParallel (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1065:38509)\n    at #resolveAndReplacePlaceholders (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1065:45114)\n    at _ResolverManager.resolveAndReplacePlaceholdersInConfig (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1065:44874)\n    at resolvePluginVariables (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1059:3718)\n    at runFramework (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1059:910)\n    at async route (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1068:14692)\n    at async Object.run2 [as run] (file:///home/crimzee/.serverless/releases/4.1.4/package/dist/sf-core.js:1068:15090)",
+      "code": "RESOLVER_PROVIDER_NOT_SUPPORTED"
+    },
+    "params": {},
+    "machineId": "7f3d201331b8ed14d6c062da6711c6e6",
+    "accessKeyV2": "<REDACTED>",
+    "accessKeyV1": "<REDACTED>",
+    "orgId": "ac2308e3-0cdf-40f2-a23a-57655581e525",
+    "orgName": "kremzeeq",
+    "userId": "LtS6CHkHNGrF0L5jRW",
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "userName": "kremzeeq",
+    "subscription": null,
+    "userEmail": "sian.thompson@gmx.co.uk",
+    "serviceProviderAwsCredentials": "<REDACTED>",
+    "serviceProviderAwsAccountId": "730335574309",
+    "versionSf": "4.1.4",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:eu-west-2:730335574309:stack/fruit-project-api-scraper-dev/a9ef9ea0-2a9d-11ef-8e4b-02b4ae623511",
+    "serviceProviderAwsCfStackCreated": "2024-06-14T22:30:12.175Z",
+    "serviceProviderAwsCfStackUpdated": "2024-06-17T10:51:54.891Z",
+    "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "FruitDashprojectDashapiDashscraperLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:eu-west-2:730335574309:function:fruit-project-api-scraper-dev-fruit-project-api-scraper:4",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-fruit-project-api-scraper-dev-FruitDashprojectDashapiDashscraperLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "fruit-project-api-scraper-serverlessdeploymentbuck-2ibqx6snms60",
+        "ExportName": "sls-fruit-project-api-scraper-dev-ServerlessDeploymentBucketName"
+      }
+    ]
+  }
+}
