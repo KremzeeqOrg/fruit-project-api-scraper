@@ -5,6 +5,7 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-prune-plugin
+  - serverless-python-requirements
 
 params:
   default:
@@ -54,3 +55,5 @@ custom:
   prune:
     automatic: true
     number: 3
+  pythonRequirements:
+    dockerImage: ${param:app}:latest
