@@ -20,7 +20,7 @@ provider:
   ecr:
     images:
       fruitProjectApiScraper:
-        uri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
+        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${param:app}:latest
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
@@ -43,9 +43,9 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table1}
-            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table2}
-            - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:${param:table3}
+            - Fn::Sub: arn:aws:dynamodb:${aws:region}:${aws:accountId}:${param:table1}
+            - Fn::Sub: arn:aws:dynamodb:${aws:region}:${aws:accountId}:${param:table2}
+            - Fn::Sub: arn:aws:dynamodb:${aws:region}:${aws:accountId}:${param:table3}
 
 functions:
   fruit-project-api-scraper:
