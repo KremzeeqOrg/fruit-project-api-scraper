@@ -5,7 +5,7 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-prune-plugin
-  - serverless-python-requirements
+  # - serverless-python-requirements
 
 params:
   default:
@@ -19,7 +19,7 @@ provider:
   runtime: python3.10
   ecr:
     images:
-      fruit-project-api-scraper:
+      fruitProjectApiScraper:
         path: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${param:app}:latest
   region: eu-west-2
   runtimeManagement: auto
@@ -49,11 +49,11 @@ provider:
 
 functions:
   fruit-project-api-scraper:
-    image: fruit-project-api-scraper
+    image: fruitProjectApiScraper
 
 custom:
   prune:
     automatic: true
     number: 3
-  pythonRequirements:
-    dockerImage: ${param:app}:latest
+  # pythonRequirements:
+  #   dockerImage: ${param:app}:latest
