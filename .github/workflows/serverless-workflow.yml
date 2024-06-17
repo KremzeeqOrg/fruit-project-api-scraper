@@ -14,11 +14,11 @@ env:
   PYTHON_VERSION: '3.10'
   NODE_VERSION: 20
   AWS_REGION: "eu-west-2"
-  SLS_STAGE: "dev"
+  ENV: dev
 
 jobs:
   pytest:
-    name: "Pytest"
+    name: Pytest
     runs-on: ubuntu-latest
     strategy:  
       matrix:  
@@ -39,11 +39,11 @@ jobs:
       continue-on-error: true
     - name: Test with pytest
       run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
-  sls-deploy:
+  sls-package-and-deploy:
     permissions:
       id-token: write
       contents: read
-    name: deploy
+    name: "Serverless Package and Deploy"
     needs: pytest
     runs-on: ubuntu-latest
     steps:
@@ -64,16 +64,22 @@ jobs:
         aws-region: ${{ env.AWS_REGION }}
         mask-aws-account-id: true
     - name: serverless package
-      # close to dry run. Packages entire infrastructure defined as per serverless.yml
-      run: npm install && npm list && serverless package --stage ${{ env.SLS_STAGE }} --region ${{ env.AWS_REGION }} --package .serverless.${{ env.SLS_STAGE }}
-    # - name: serverless deploy
-    #   # if: github.ref != 'refs/heads/main'
-    #   uses: serverless/github-action@v3.2
-    #   with:
-    #     args: -c "npm install && npm list -g && serverless deploy --stage ${{ env.SLS_STAGE }} --region ${{ env.AWS_REGION }} --package .serverless.${{ env.SLS_STAGE }} --verbose"
-    #     entrypoint: /bin/bash
-    #   env:
-    #     SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+      # if: github.ref != 'refs/heads/main'
+      uses: serverless/github-action@v3.2
+      with:
+        args: -c "npm install && npm list -g && serverless package --package .serverless.${{ env.ENV }} --verbose"
+        entrypoint: /bin/bash
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+
+    - name: serverless deploy
+      # if: github.ref != 'refs/heads/main'
+      uses: serverless/github-action@v3.2
+      with:
+        args: -c "serverless deploy --package .serverless.${{ env.ENV }} --verbose"
+        entrypoint: /bin/bash
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
 
 
