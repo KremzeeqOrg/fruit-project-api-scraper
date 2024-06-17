@@ -26,14 +26,14 @@ provider:
 
 
 
-ecr:
-images:
-  fruit-project-api-scraper:
-    path: ./
+# ecr:
+# images:
+#   fruit-project-api-scraper:
+#     path: ./
 
 functions:
   fruit-project-api-scraper:
-    image: fruit-project-api-scraper:latest
+    image: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${env.APP}:latest
 iam:
   role:
     name: ${env:APP}-lambda-role
