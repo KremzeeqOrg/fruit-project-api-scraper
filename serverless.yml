@@ -17,7 +17,6 @@ params:
     targetApi2: 'the-cocktail-db'
     targetApi3: 'the-meal-db'
     dynamoDbArnPrefix : 'arn:aws:dynamodb:${aws:region}:${aws:accountId}:table'
-    functionName: '${self:service}-${sls:stage}'
 
 provider:
   name: aws
@@ -75,9 +74,6 @@ stepFunctions:
             Next: CocktailTableUpdate
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
-            Catch:
-            - ErrorEquals: ["States.ALL"] 
-              Next: ScrapingFailed
             Parameters:
               FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
               Payload:
@@ -88,33 +84,19 @@ stepFunctions:
             Next: FoodTableUpdate
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
-            Catch:
-            - ErrorEquals: ["States.ALL"] 
-              Next: ScrapingFailed
             Parameters:
               FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi2}
           FoodTableUpdate:
-            Next: ScrapingSucessful
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
-            Catch:
-            - ErrorEquals: ["States.ALL"] 
-              Next: ScrapingFailed
             Parameters:
               FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi3}
-          ScrapingFailed:
-            Type: Fail
-            Result: "Failed due to error raised"
-            End: true
-          ScrapingSucessful:
-            Type: Pass
-            Result: "All target apis scraped"
             End: true
 
 custom:
