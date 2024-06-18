@@ -14,3 +14,6 @@ package-lock.json
 node_modules
 .serverless
 .serverless/*
+.gitignore
+ruff.toml
+README.md
