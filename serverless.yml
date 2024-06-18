@@ -80,7 +80,7 @@ stepFunctions:
             - ErrorEquals: ["States.ALL"] 
               Next: ScrapingFailed
             Parameters:
-              FunctionName: ${param.lambdaArnPrefix}:${param:functionName}
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi1}
@@ -93,7 +93,7 @@ stepFunctions:
             - ErrorEquals: ["States.ALL"] 
               Next: ScrapingFailed
             Parameters:
-              FunctionName: ${param.lambdaArnPrefix}:${param:functionName}
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi2}
@@ -105,7 +105,7 @@ stepFunctions:
             - ErrorEquals: ["States.ALL"] 
               Next: ScrapingFailed
             Parameters:
-              FunctionName: ${param.lambdaArnPrefix}:${param:functionName}
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi3}
@@ -117,7 +117,7 @@ stepFunctions:
             Type: Pass
             Result: "All target apis scraped"
             End: true
-            
+
 custom:
   prune:
     automatic: true
