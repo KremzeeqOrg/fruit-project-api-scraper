@@ -76,7 +76,8 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             Catch:
-            - ErrorEquals: ["States.ALL"] 
+            - ErrorEquals: ["States.ALL"]
+              ResultPath: $.errorInfo
               Next: ScrapingFailed
             Parameters:
               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
@@ -88,7 +89,8 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             Catch:
-            - ErrorEquals: ["States.ALL"] 
+            - ErrorEquals: ["States.ALL"]
+              ResultPath: $.errorInfo
               Next: ScrapingFailed
             Parameters:
               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
@@ -101,6 +103,7 @@ stepFunctions:
             Resource: arn:aws:states:::lambda:invoke
             Catch:
             - ErrorEquals: ["States.ALL"] 
+              ResultPath: $.errorInfo
               Next: ScrapingFailed
             Parameters:
               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
@@ -109,6 +112,8 @@ stepFunctions:
                 sourceApiName: ${param:targetApi3}
           ScrapingFailed:
             Type: Fail
+            Cause: "Scraping process failed"
+            Error: "ScrapingError"
             Result: "Failed due to error raised"
             End: true
           ScrapingSucessful:
