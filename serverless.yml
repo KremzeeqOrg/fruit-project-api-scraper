@@ -5,7 +5,7 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-prune-plugin
-
+  
 params:
   default:
     table1: 'fruit'
