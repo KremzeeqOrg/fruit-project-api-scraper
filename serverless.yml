@@ -76,7 +76,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke 
             Parameters:
-              FunctionName: ${param:functionName}
+              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
               Payload:
                 APP: ${self:service}
                 SOURCE_API_NAME: ${param:targetApi1}
@@ -86,7 +86,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             Parameters:
-              FunctionName: ${param:functionName}
+              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
               Payload:
                 APP: ${self:service}
                 SOURCE_API_NAME: ${param:targetApi2}
@@ -94,7 +94,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             Parameters:
-              FunctionName: ${param:functionName}
+              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
               Payload:
                 APP: ${self:service}
                 SOURCE_API_NAME: ${param:targetApi3}
