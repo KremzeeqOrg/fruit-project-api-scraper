@@ -11,8 +11,13 @@ params:
     table1: 'fruit'
     table2: 'cocktail-recipes'
     table3: 'food-recipes'
+    targetApi1: 'fruity-vice'
+    targetApi2: 'the-cocktail-db'
+    targetApi3: 'the-meal-db'
+    functionName: '${self:service}-${sls:stage}'
     dynamo_db_arn_prefix : "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
-
+    lambdaArnPrefix: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
+     
 provider:
   name: aws
   runtime: python3.10
@@ -26,7 +31,7 @@ provider:
   timeout: 10
   environment:
     APP: ${self:service}
-    SOURCE_API_NAME: "fruity-vice"
+    SOURCE_API_NAME: ${param:targetApi1}
 
   iam:
     role:
@@ -53,10 +58,45 @@ provider:
 
 functions:
   app:
-    name: ${self:service}-${sls:stage}
+    name: ${param:functionName}
     runtime: python3.10
     image: appImage
 
+stepFunctions:
+  stateMachines:
+    projectStateMachine:
+      name: ${self:service}-state-machine
+      definition:
+        Comment: "State Machine to chain executions of fruit-project-api-scraper"
+        StartAt: FruitTableUpdate
+        States:
+          FruitTableUpdate:
+            Next: CocktailTableUpdate
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            Parameters:
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+              Payload:
+                app: ${self:service}
+                sourceApiName: ${param:targetApi1}
+          CocktailTableUpdate:
+            Next: FoodTableUpdate
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            Parameters:
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+              Payload:
+                app: ${self:service}
+                sourceApiName: ${param:targetApi2}
+          FoodTableUpdate:
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            Parameters:
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+              Payload:
+                app: ${self:service}
+                sourceApiName: ${param:targetApi3}
+            End: true
 custom:
   prune:
     automatic: true
