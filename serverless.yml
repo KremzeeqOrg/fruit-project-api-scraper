@@ -17,6 +17,7 @@ params:
     targetApi2: 'the-cocktail-db'
     targetApi3: 'the-meal-db'
     dynamoDbArnPrefix : 'arn:aws:dynamodb:${aws:region}:${aws:accountId}:table'
+    functionName: '${self:service}-${sls:stage}'
 
 provider:
   name: aws
