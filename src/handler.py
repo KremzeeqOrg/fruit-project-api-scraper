@@ -11,7 +11,7 @@ def main(event, context):
   event_body = json.loads(event['body'])
   app = event_body["app"]
   source_api_name = event_body['sourceApiName']
-  orchestrator = Orchestrator(APP, SOURCE_API_NAME)
+  orchestrator = Orchestrator(app, source_api_name)
   orchestrator.execute()
 
 if __name__ == '__main__':
