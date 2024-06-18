@@ -17,6 +17,7 @@ params:
     targetApi2: 'the-cocktail-db'
     targetApi3: 'the-meal-db'
     dynamoDbArnPrefix : 'arn:aws:dynamodb:${aws:region}:${aws:accountId}:table'
+    lambdaArnPrefix: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
     functionName: '${self:service}-${sls:stage}'
 
 provider:
@@ -76,7 +77,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             Parameters:
-              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi1}
@@ -86,7 +87,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             Parameters:
-              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi2}
@@ -94,7 +95,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             Parameters:
-              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi3}
