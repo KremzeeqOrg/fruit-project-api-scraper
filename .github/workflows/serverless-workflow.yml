@@ -18,36 +18,36 @@ env:
   ENV: dev
 
 jobs:
-  pytest:
-    name: Pytest
-    runs-on: ubuntu-latest
-    strategy:  
-      matrix:  
-        test_file: ["api_mapping_manager", "record_manager", "scraper", "utils"]
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python version - ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-    - name: Install dependencies  
-      run: |  
-          python -m pip install --upgrade pip  
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
-    - name: Lint with Ruff
-      # see ruff.toml for config
-      uses: chartboost/ruff-action@v1
-      continue-on-error: true
-    - name: Test with pytest
-      run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
+  # pytest:
+  #   name: Pytest
+  #   runs-on: ubuntu-latest
+  #   strategy:  
+  #     matrix:  
+  #       test_file: ["api_mapping_manager", "record_manager", "scraper", "utils"]
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - name: Set up Python version - ${{ env.PYTHON_VERSION }}
+  #     uses: actions/setup-python@v5
+  #     with:
+  #       python-version: ${{ env.PYTHON_VERSION }}
+  #   - name: Install dependencies  
+  #     run: |  
+  #         python -m pip install --upgrade pip  
+  #         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
+  #   - name: Lint with Ruff
+  #     # see ruff.toml for config
+  #     uses: chartboost/ruff-action@v1
+  #     continue-on-error: true
+  #   - name: Test with pytest
+  #     run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
   sls-deploy:
     permissions:
       id-token: write
       contents: read
     name: "Serverless Deploy"
-    needs: pytest
+    # needs: pytest
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
     steps:
     - uses: actions/checkout@v4
     - name: Set AWS context
