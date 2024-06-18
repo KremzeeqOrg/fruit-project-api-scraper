@@ -16,7 +16,7 @@ params:
     targetApi2: 'the-cocktail-db'
     targetApi3: 'the-meal-db'
     functionName: '${self:service}-${sls:stage}'
-    dynamo_db_arn_prefix : "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
+    dynamoDbArnPrefix: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
     lambdaArnPrefix: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
      
 provider:
@@ -49,9 +49,9 @@ provider:
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
           Resource:
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table1}
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table2}
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table3}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table1}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table2}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table3}
         - Effect: "Allow"
           Action:
             - ssm:GetParameter
@@ -76,7 +76,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             Parameters:
-              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi1}
@@ -85,7 +85,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             Parameters:
-              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi2}
@@ -93,7 +93,7 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
             Parameters:
-              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi3}
