@@ -18,7 +18,7 @@ provider:
   runtime: python3.10
   ecr:
     images:
-      fruitProjectApiScraper:
+      appImage:
         uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:latest
   region: eu-west-2
   runtimeManagement: auto
@@ -30,7 +30,7 @@ provider:
 
   iam:
     role:
-      name: ${param:app}-lambda-role
+      name: ${self:service}-lambda-role
       statements:
         - Effect: "Allow"
           Action:
@@ -51,10 +51,10 @@ provider:
           Resource: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${self:service}--*
 
 functions:
-  fruitProjectApiScraper:
+  app:
     name: ${self:service}-${sls:stage}
     runtime: python3.10
-    image: fruitProjectApiScraper
+    image: appImage
 
 custom:
   prune:
