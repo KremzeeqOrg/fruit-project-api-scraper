@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "serverless-prune-plugin": "^2.0.2"
+    "serverless-prune-plugin": "^2.0.2",
+    "serverless-step-functions": "1.12.0"
   }
 }

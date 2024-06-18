@@ -5,12 +5,17 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-prune-plugin
+  - serverless-step-functions
 
 params:
   default:
+    stack:  'fruit-project'
     table1: 'fruit'
     table2: 'cocktail-recipes'
     table3: 'food-recipes'
+    targetApi1: 'fruity-vice'
+    targetApi2: 'the-cocktail-db'
+    targetApi3: 'the-meal-db'
     dynamo_db_arn_prefix : "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
 
 provider:
@@ -26,7 +31,7 @@ provider:
   timeout: 10
   environment:
     APP: ${self:service}
-    SOURCE_API_NAME: "fruity-vice"
+    SOURCE_API_NAME: ${param:targeApi1}
 
   iam:
     role:
@@ -56,6 +61,42 @@ functions:
     name: ${self:service}-${sls:stage}
     runtime: python3.10
     image: appImage
+
+stepFunctions:
+  stateMachines:
+    projectStateMachine:
+      name: ${param:stack}
+      definition:
+        Comment: "State Machine to execute function update for each DynamoDB table"
+        StartAt: FruitTableUpdate
+        States:
+          FruitTableUpdate:
+            Next: CocktailTableUpdate
+            Type: Task
+            Resource: "arn:aws:states:::lambda:invoke" 
+            Parameters:
+              FunctionName: Fn::GetAtt: [app, Arn]
+              Payload:
+                APP: ${self:service}
+                SOURCE_API_NAME: ${param:targeApi1}
+            
+          CocktailTableUpdate:
+            Next: FoodTableUpdate
+            Type: Task
+            Resource: "arn:aws:states:::lambda:invoke" 
+            Parameters:
+              FunctionName: Fn::GetAtt: [app, Arn]
+              Payload:
+                APP: ${self:service}
+                SOURCE_API_NAME: ${param:targeApi2}
+          FoodTableUpdate:
+            Resource: "arn:aws:states:::lambda:invoke" 
+            Parameters:
+              FunctionName: Fn::GetAtt: [app, Arn]
+              Payload:
+                APP: ${self:service}
+                SOURCE_API_NAME: ${param:targeApi3}
+            End: true
 
 custom:
   prune:
