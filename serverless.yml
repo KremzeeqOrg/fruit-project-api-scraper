@@ -1,0 +1,63 @@
+# serverless.yml
+
+service: fruit-project-api-scraper
+frameworkVersion: '3'
+
+plugins:
+  - serverless-prune-plugin
+
+params:
+  default:
+    table1: 'fruit'
+    table2: 'cocktail-recipes'
+    table3: 'food-recipes'
+    dynamo_db_arn_prefix : "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
+
+provider:
+  name: aws
+  runtime: python3.10
+  ecr:
+    images:
+      appImage:
+        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:latest
+  region: eu-west-2
+  runtimeManagement: auto
+  memorySize: 512
+  timeout: 10
+  environment:
+    APP: ${self:service}
+    SOURCE_API_NAME: "fruity-vice"
+
+  iam:
+    role:
+      name: ${self:service}-lambda-role
+      statements:
+        - Effect: "Allow"
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
+          Resource:
+            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table1}
+            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table2}
+            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table3}
+        - Effect: "Allow"
+          Action:
+            - ssm:GetParameter
+          Resource: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${self:service}--*
+
+functions:
+  app:
+    name: ${self:service}-${sls:stage}
+    runtime: python3.10
+    image: appImage
+
+custom:
+  prune:
+    automatic: true
+    number: 3
