@@ -8,7 +8,7 @@ SOURCE_API_NAME = os.environ.get("SOURCE_API_NAME")
 
 
 def main(event, context):
-  event_body = json.loads(event['body'])
+  payload = json.loads(event['Payload'])
   app = event_body["app"]
   source_api_name = event_body['sourceApiName']
   orchestrator = Orchestrator(app, source_api_name)
