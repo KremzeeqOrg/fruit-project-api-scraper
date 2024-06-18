@@ -16,7 +16,8 @@ params:
     targetApi1: 'fruity-vice'
     targetApi2: 'the-cocktail-db'
     targetApi3: 'the-meal-db'
-    dynamo_db_arn_prefix : "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
+    dynamoDbArnPrefix : 'arn:aws:dynamodb:${aws:region}:${aws:accountId}:table'
+    lambdaArnPrefix : 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
     functionName: '${self:service}-${sls:stage}'
 
 provider:
@@ -49,9 +50,9 @@ provider:
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
           Resource:
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table1}
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table2}
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table3}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table1}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table2}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table3}
         - Effect: "Allow"
           Action:
             - ssm:GetParameter
@@ -74,32 +75,49 @@ stepFunctions:
           FruitTableUpdate:
             Next: CocktailTableUpdate
             Type: Task
-            Resource: arn:aws:states:::lambda:invoke 
+            Resource: arn:aws:states:::lambda:invoke
+            Catch:
+            - ErrorEquals: ["States.ALL"] 
+              Next: ScrapingFailed
             Parameters:
-              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
+              FunctionName: ${param.lambdaArnPrefix}:${param:functionName}
               Payload:
-                APP: ${self:service}
-                SOURCE_API_NAME: ${param:targetApi1}
+                app: ${self:service}
+                sourceApiName: ${param:targetApi1}
             
           CocktailTableUpdate:
             Next: FoodTableUpdate
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
+            Catch:
+            - ErrorEquals: ["States.ALL"] 
+              Next: ScrapingFailed
             Parameters:
-              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
+              FunctionName: ${param.lambdaArnPrefix}:${param:functionName}
               Payload:
-                APP: ${self:service}
-                SOURCE_API_NAME: ${param:targetApi2}
+                app: ${self:service}
+                sourceApiName: ${param:targetApi2}
           FoodTableUpdate:
+            Next: ScrapingSucessful
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
+            Catch:
+            - ErrorEquals: ["States.ALL"] 
+              Next: ScrapingFailed
             Parameters:
-              FunctionName: arn:aws:lambda:${aws:region}:${aws:accountId}:function:${param:functionName}
+              FunctionName: ${param.lambdaArnPrefix}:${param:functionName}
               Payload:
-                APP: ${self:service}
-                SOURCE_API_NAME: ${param:targetApi3}
+                app: ${self:service}
+                sourceApiName: ${param:targetApi3}
+          ScrapingFailed:
+            Type: Fail
+            Result: "Failed due to error raised"
             End: true
-
+          ScrapingSucessful:
+            Type: Pass
+            Result: "All target apis scraped"
+            End: true
+            
 custom:
   prune:
     automatic: true
