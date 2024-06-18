@@ -11,7 +11,7 @@ params:
     table1: 'fruit'
     table2: 'cocktail-recipes'
     table3: 'food-recipes'
-    app: 'fruit-project-api-scraper'
+    dynamo_db_arn_prefix : "arn:aws:dynamodb:${aws:region}:${aws:accountId}"
 
 provider:
   name: aws
@@ -19,7 +19,7 @@ provider:
   ecr:
     images:
       fruitProjectApiScraper:
-        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${param:app}:latest
+        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${sls:service}:latest
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
@@ -42,17 +42,17 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - Fn::Sub: arn:aws:dynamodb:${aws:region}:${aws:accountId}:${param:table1}
-            - Fn::Sub: arn:aws:dynamodb:${aws:region}:${aws:accountId}:${param:table2}
-            - Fn::Sub: arn:aws:dynamodb:${aws:region}:${aws:accountId}:${param:table3}
+            - Fn::Sub: ${param:dynamo_db_arn_prefix}:${param:table1}
+            - Fn::Sub: ${param:dynamo_db_arn_prefix}:${param:table2}
+            - Fn::Sub: a${param:dynamo_db_arn_prefix}:${param:table3}
         - Effect: "Allow"
           Action:
-            - ssm:GetParameters
-          Resource: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${param:app}--*
+            - ssm:GetParameter
+          Resource: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${sls:service}--*
 
 functions:
   fruitProjectApiScraper:
-    name: ${param:app}-${sls:stage}
+    name: ${sls:service}-${sls:stage}
     runtime: python3.10
     image: fruitProjectApiScraper
 
