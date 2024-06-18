@@ -48,6 +48,7 @@ provider:
 
 functions:
   fruitProjectApiScraper:
+    runtime: python3.10
     image: fruitProjectApiScraper
 
 custom:
