@@ -77,7 +77,6 @@ jobs:
       run: | 
         npm i -g serverless@3.2
         npm install && npm list -g
-        serverless remove --stage dev --region ${{ env.AWS_REGION }}
         serverless deploy --verbose
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
