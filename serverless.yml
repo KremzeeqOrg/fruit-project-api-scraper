@@ -83,7 +83,7 @@ stepFunctions:
               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
                 app: ${self:service}
-                sourceApiName: ${param:targetApi1}
+                sourceApiName: fake
           CocktailTableUpdate:
             Next: FoodTableUpdate
             Type: Task
@@ -113,8 +113,7 @@ stepFunctions:
           ScrapingFailed:
             Type: Fail
             Cause: "Scraping process failed"
-            Error: "ScrapingError"
-            Result: "Failed due to error raised"
+            Error: "Error Encountered during scraping"
             End: true
           ScrapingSucessful:
             Type: Pass
