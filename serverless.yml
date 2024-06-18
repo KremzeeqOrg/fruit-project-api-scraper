@@ -5,14 +5,20 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-prune-plugin
+  - serverless-step-functions
 
 params:
   default:
     table1: 'fruit'
     table2: 'cocktail-recipes'
     table3: 'food-recipes'
-    dynamo_db_arn_prefix : "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
-
+    targetApi1: 'fruity-vice'
+    targetApi2: 'the-cocktail-db'
+    targetApi3: 'the-meal-db'
+    functionName: '${self:service}-${sls:stage}'
+    dynamoDbArnPrefix: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
+    lambdaArnPrefix: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
+     
 provider:
   name: aws
   runtime: python3.10
@@ -26,7 +32,7 @@ provider:
   timeout: 10
   environment:
     APP: ${self:service}
-    SOURCE_API_NAME: "fruity-vice"
+    SOURCE_API_NAME: ${param:targetApi1}
 
   iam:
     role:
@@ -43,9 +49,9 @@ provider:
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
           Resource:
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table1}
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table2}
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table3}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table1}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table2}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table3}
         - Effect: "Allow"
           Action:
             - ssm:GetParameter
@@ -53,9 +59,65 @@ provider:
 
 functions:
   app:
-    name: ${self:service}-${sls:stage}
+    name: ${param:functionName}
     runtime: python3.10
     image: appImage
+
+stepFunctions:
+  stateMachines:
+    projectStateMachine:
+      name: ${self:service}-state-machine
+      definition:
+        Comment: "State Machine to chain executions of fruit-project-api-scraper"
+        StartAt: FruitTableUpdate
+        States:
+          FruitTableUpdate:
+            Next: CocktailTableUpdate
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            Catch:
+            - ErrorEquals: ["States.ALL"]
+              ResultPath: $.errorInfo
+              Next: ScrapingFailed
+            Parameters:
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+              Payload:
+                app: ${self:service}
+                sourceApiName: ${param:targetApi1}
+          CocktailTableUpdate:
+            Next: FoodTableUpdate
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            Catch:
+            - ErrorEquals: ["States.ALL"]
+              ResultPath: $.errorInfo
+              Next: ScrapingFailed
+            Parameters:
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+              Payload:
+                app: ${self:service}
+                sourceApiName: ${param:targetApi2}
+          FoodTableUpdate:
+            Next: ScrapingSucessful
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            Catch:
+            - ErrorEquals: ["States.ALL"] 
+              ResultPath: $.errorInfo
+              Next: ScrapingFailed
+            Parameters:
+              FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+              Payload:
+                app: ${self:service}
+                sourceApiName: ${param:targetApi3}
+          ScrapingFailed:
+            Type: Fail
+            Cause: "Scraping process failed"
+            Error: "Error Encountered during scraping"
+          ScrapingSucessful:
+            Type: Pass
+            Result: "All target apis scraped"
+            End: true
 
 custom:
   prune:
