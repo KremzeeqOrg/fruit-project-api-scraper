@@ -76,6 +76,7 @@ jobs:
       # if: github.ref == 'refs/heads/main'
       run: | 
         npm i -g serverless@3.2
+        serverless remove --stage dev --region ${{ env.AWS_REGION }}
         npm install && npm list -g
         serverless deploy --verbose
       env:
