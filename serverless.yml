@@ -75,6 +75,9 @@ stepFunctions:
             Next: CocktailTableUpdate
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
+            Catch:
+            - ErrorEquals: ["States.ALL"] 
+              Next: ScrapingFailed
             Parameters:
               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
@@ -84,20 +87,35 @@ stepFunctions:
             Next: FoodTableUpdate
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
+            Catch:
+            - ErrorEquals: ["States.ALL"] 
+              Next: ScrapingFailed
             Parameters:
               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi2}
           FoodTableUpdate:
+            Next: ScrapingSucessful
             Type: Task
             Resource: arn:aws:states:::lambda:invoke
+            Catch:
+            - ErrorEquals: ["States.ALL"] 
+              Next: ScrapingFailed
             Parameters:
               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi3}
+          ScrapingFailed:
+            Type: Fail
+            Result: "Failed due to error raised"
             End: true
+          ScrapingSucessful:
+            Type: Pass
+            Result: "All target apis scraped"
+            End: true
+
 custom:
   prune:
     automatic: true
