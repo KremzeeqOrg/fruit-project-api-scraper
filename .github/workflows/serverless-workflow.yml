@@ -12,7 +12,7 @@ on:
 env:
   TEST_DIR: "src/tests"
   PYTHON_VERSION: '3.11'
-  SERVERLESS_VERSION: 4
+  SERVERLESS_VERSION: 4.0.35
   NODE_VERSION: 20
   AWS_REGION: "eu-west-2"
   APP: "fruit-project-api-scraper"
