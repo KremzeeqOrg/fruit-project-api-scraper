@@ -45,9 +45,14 @@ provider:
             - Fn::Sub: arn:aws:dynamodb:${aws:region}:${aws:accountId}:${param:table1}
             - Fn::Sub: arn:aws:dynamodb:${aws:region}:${aws:accountId}:${param:table2}
             - Fn::Sub: arn:aws:dynamodb:${aws:region}:${aws:accountId}:${param:table3}
+        - Effect: "Allow"
+          Action:
+            - ssm:GetParameters
+          Resource: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${param:app}--*
 
 functions:
   fruitProjectApiScraper:
+    name: ${param:app}-${sls:stage}
     runtime: python3.10
     image: fruitProjectApiScraper
 
