@@ -5,7 +5,7 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-prune-plugin
-  
+
 params:
   default:
     table1: 'fruit'
@@ -41,6 +41,7 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
           Resource:
             - Fn::Sub: ${param:dynamo_db_arn_prefix}:${param:table1}
             - Fn::Sub: ${param:dynamo_db_arn_prefix}:${param:table2}
