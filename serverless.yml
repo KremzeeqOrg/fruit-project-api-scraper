@@ -16,7 +16,7 @@ params:
     targetApi1: 'fruity-vice'
     targetApi2: 'the-cocktail-db'
     targetApi3: 'the-meal-db'
-    dynamoDbArnPrefix : 'arn:aws:dynamodb:${aws:region}:${aws:accountId}:table'
+    dynamoDbArnPrefix: 'arn:aws:dynamodb:${aws:region}:${aws:accountId}:table'
     lambdaArnPrefix: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
     functionName: '${self:service}-${sls:stage}'
 
@@ -67,9 +67,9 @@ functions:
 stepFunctions:
   stateMachines:
     projectStateMachine:
-      name: ${param:stack}
+      name: ${self:service}-state-machine
       definition:
-        Comment: "State Machine to execute function update for each DynamoDB table"
+        Comment: "State Machine to chain executions of fruit-project-api-scraper"
         StartAt: FruitTableUpdate
         States:
           FruitTableUpdate:
@@ -81,7 +81,6 @@ stepFunctions:
               Payload:
                 app: ${self:service}
                 sourceApiName: ${param:targetApi1}
-            
           CocktailTableUpdate:
             Next: FoodTableUpdate
             Type: Task
