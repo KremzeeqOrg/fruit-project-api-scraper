@@ -31,7 +31,7 @@ provider:
   timeout: 10
   environment:
     APP: ${self:service}
-    SOURCE_API_NAME: ${param:targeApi1}
+    SOURCE_API_NAME: ${param:targetApi1}
 
   iam:
     role:
