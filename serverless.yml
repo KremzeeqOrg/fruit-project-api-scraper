@@ -73,29 +73,30 @@ stepFunctions:
           FruitTableUpdate:
             Next: CocktailTableUpdate
             Type: Task
-            Resource: "arn:aws:states:::lambda:invoke" 
+            Resource: arn:aws:states:::lambda:invoke 
             Parameters:
-              FunctionName: Fn::GetAtt: [app, Arn]
+              FunctionName: !GetAtt [app, Arn]
               Payload:
                 APP: ${self:service}
-                SOURCE_API_NAME: ${param:targeApi1}
+                SOURCE_API_NAME: ${param:targetApi1}
             
           CocktailTableUpdate:
             Next: FoodTableUpdate
             Type: Task
-            Resource: "arn:aws:states:::lambda:invoke" 
+            Resource: arn:aws:states:::lambda:invoke
             Parameters:
-              FunctionName: Fn::GetAtt: [app, Arn]
+              FunctionName: !GetAtt [app, Arn]
               Payload:
                 APP: ${self:service}
-                SOURCE_API_NAME: ${param:targeApi2}
+                SOURCE_API_NAME: ${param:targetApi2}
           FoodTableUpdate:
-            Resource: "arn:aws:states:::lambda:invoke" 
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
             Parameters:
-              FunctionName: Fn::GetAtt: [app, Arn]
+              FunctionName: !GetAtt [app, Arn]
               Payload:
                 APP: ${self:service}
-                SOURCE_API_NAME: ${param:targeApi3}
+                SOURCE_API_NAME: ${param:targetApi3}
             End: true
 
 custom:
