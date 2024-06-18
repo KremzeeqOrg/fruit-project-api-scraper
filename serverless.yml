@@ -19,13 +19,13 @@ provider:
   ecr:
     images:
       fruitProjectApiScraper:
-        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${sls:service}:latest
+        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:latest
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
   timeout: 10
   environment:
-    APP: ${param:app}
+    APP: ${self:service}
     SOURCE_API_NAME: "fruity-vice"
 
   iam:
@@ -48,11 +48,11 @@ provider:
         - Effect: "Allow"
           Action:
             - ssm:GetParameter
-          Resource: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${sls:service}--*
+          Resource: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${self:service}--*
 
 functions:
   fruitProjectApiScraper:
-    name: ${sls:service}-${sls:stage}
+    name: ${self:service}-${sls:stage}
     runtime: python3.10
     image: fruitProjectApiScraper
 
