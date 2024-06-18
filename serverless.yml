@@ -114,7 +114,6 @@ stepFunctions:
             Type: Fail
             Cause: "Scraping process failed"
             Error: "Error Encountered during scraping"
-            End: true
           ScrapingSucessful:
             Type: Pass
             Result: "All target apis scraped"
