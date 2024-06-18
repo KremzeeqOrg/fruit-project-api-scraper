@@ -83,7 +83,7 @@ stepFunctions:
               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
               Payload:
                 app: ${self:service}
-                sourceApiName: fake
+                sourceApiName: ${param:targetApi1}
           CocktailTableUpdate:
             Next: FoodTableUpdate
             Type: Task
