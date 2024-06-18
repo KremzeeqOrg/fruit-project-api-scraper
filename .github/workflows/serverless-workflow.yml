@@ -11,7 +11,8 @@ on:
 
 env:
   TEST_DIR: "src/tests"
-  PYTHON_VERSION: '3.10'
+  PYTHON_VERSION: '3.11'
+  SERVERLESS_VERSION: 4
   NODE_VERSION: 20
   AWS_REGION: "eu-west-2"
   APP: "fruit-project-api-scraper"
@@ -75,7 +76,7 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - name: serverless deploy
       run: | 
-        npm i -g serverless@3.2
+        npm i -g serverless@${{ env.SERVERLESS_VERSION }}
         npm install && npm list -g
         serverless deploy --verbose
       env:

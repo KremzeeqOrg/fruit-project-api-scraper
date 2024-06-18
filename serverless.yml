@@ -1,21 +1,21 @@
 # serverless.yml
 
 service: fruit-project-api-scraper
-frameworkVersion: '3'
+frameworkVersion: '4'
 
 plugins:
   - serverless-prune-plugin
 
-params:
+stages:
   default:
     table1: 'fruit'
     table2: 'cocktail-recipes'
     table3: 'food-recipes'
-    dynamo_db_arn_prefix : "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
+    dynamoDbArnPrefix : 'arn:aws:dynamodb:${aws:region}:${aws:accountId}:table'
 
 provider:
   name: aws
-  runtime: python3.10
+  runtime: 'python3.11'
   ecr:
     images:
       appImage:
@@ -43,9 +43,9 @@ provider:
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
           Resource:
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table1}
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table2}
-            - Fn::Sub: ${param:dynamo_db_arn_prefix}/${param:table3}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table1}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table2}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table3}
         - Effect: "Allow"
           Action:
             - ssm:GetParameter
@@ -54,7 +54,7 @@ provider:
 functions:
   app:
     name: ${self:service}-${sls:stage}
-    runtime: python3.10
+    runtime: python3.11
     image: appImage
 
 custom:
