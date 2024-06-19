@@ -1,7 +1,6 @@
 # Fruit Project API Scraper
 
-Python API scraper designed to be deployed as a AWS lambda, to support a ETL workflow.
-A state machine in AWS Step Functions orchestrates executions of the scraper with custom payloads, so that scraped records from target APIs can be sent to target tables in DynamoDb.
+Python API scraper designed to be deployed as an AWS lambda, to support an ETL workflow. The project also provisions a AWS Step Functions state machine, which orchestrates executions of the scraper with custom payloads, so that scraped records from target APIs can be sent to target tables in AWS DynamoDB.
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
@@ -30,11 +29,11 @@ A state machine in AWS Step Functions orchestrates executions of the scraper wit
 
 - When you setup your SSM parameter, this should have the format: `${app}--{sourceApiScraper}-config`.
 - The parameter serves as an external configuration file with environment variables fetched during runtime.
-- More info on this [here](## Setting up AWS SSM Parameter for source API)
-- There is also [additional mapping configuration](#Updating API Mapping Config) which can be updated to define scraping rules for the target API.
+- More info on this [here](# Setting up AWS SSM Parameter for target API)
+- There is also [additional API mapping configuration](#Updating API Mapping Config) which can be updated to define scraping rules for the target API.
 
-- Once the parameter is fetched, the application scrapes api records from an external target API.
-- It then transforms the api data so that only desired fields are kept and a timestamp is added for each record.
+- Once the SSM parameter is fetched by the application, it scrapes api records from an external target API.
+- It then transforms the api records so that only desired fields are kept and a timestamp is added for each record.
 - All records are uploaded in batches to a target table in DynamoDB.
 
 ## Summary of App modules
@@ -62,14 +61,14 @@ src
   - references the software artifact in ECR, required for the lambda.
   - defines the AWS Step Functions state machine, with payloads for chained executions of the lambda.
 
-In AWS you can execute the AWS Lambda directly, with a payload e.g. :
+In AWS you can execute the AWS Lambda (e.g. `fruit-project-api-scraper-dev`), directly, with a payload e.g. :
 
 ```
 {"app": "fruit-project-api-scraper",
 "sourceApiName": "fruity-vice"}
 ```
 
-Alternatively, you can execute AWS Step Functions state machine, which entails 3 successive executions of the scraper application. This execution takes 8-9 seconds.
+Alternatively, you can execute AWS Step Functions state machine (e.g. `fruit-project-api-scraper-state-machine`), which entails 3 successive executions of the scraper application. This execution takes 8-9 seconds.
 
 ## Running code locally
 
@@ -79,18 +78,19 @@ Alternatively, you can execute AWS Step Functions state machine, which entails 3
 
 - If you are proceding to use the entire solution for the `fruit-project`, ensure to provision foundational resources from [fruit-project-infra](https://github.com/KremzeeqOrg/fruit-project-infra)
 - This includes ensuring a AWS ECR is provisioned as well as one or more DynamoDB tables.
-- Ensure you have a CLI tool installed like `aws-vault` to work with the context for your target account AWS account.
-- Ensure config saved in the AWS Parameter Store in relation to the target API.
+- Ensure you have a CLI tool installed like `aws-vault` to work with the context for your target AWS account.
 
 ### Steps
 
-1. In AWS, setup AWS SSM Parameter with config for scraping a target api. Also, setup any target AWS Dynamo DB tables, with a specification for the hash key. Please see [here](# Setting up AWS SSM Parameter for target API) for more info on this.
+1. In AWS, setup AWS SSM Parameter with config for scraping a target api. Also, setup any target AWS Dynamo DB tables, with a specification for the hash key. Please see [here](#Setting up AWS SSM Parameter for target API) for more info on this.
 
-2. Setup and activate a virtual Python environment and run `pip install - requirements.txt` in the `src` directory
+2. Review the API Mapping Config [here](#Updating API Mapping Config). If the `api_name` is not listed for your target API, you will need to update thsi config.
 
-3. In the app [handler](./src/handler.py), uncomment the event and update the event dictionary with desired values. This simulates the payload which would otherwise be sent to the lambda in AWS.
+3. Setup and activate a virtual Python environment and run `pip install - requirements.txt` in the `src` directory
 
-4. Execute the handler: `python ./src/handler.py`
+4. In the app [handler](./src/handler.py), uncomment the event and update the event dictionary with desired values. This simulates the payload which would otherwise be sent to the lambda in AWS.
+
+5. Execute the handler: `python ./src/handler.py`
 
 ### Running tests
 
@@ -122,13 +122,13 @@ e.g.:
 
 Understanding fields in parameter:
 
-| Fields             | Explanation                                                                                                                                  |
+| Field Explanation  |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `source_api`       | This should be the same as `sourceApiName`.                                                                                                  |
 | `auth_header`      | Some apis may require an authorization header specifying a key and authentication token. It can be populated as "{}" if it is not needed.    |
-| `endpoint`         | Target api endpoint to scrape.                                                                                                               |
+| `endpoint`         | Target API endpoint to scrape.                                                                                                               |
 | `required_fields`  | Specify all the fields you would like to preserve for scraped records. Fields not specified are removed as part of the transformation stage. |
-| `dynamo_db_config` | Specify the target Dynamo DB table and hash_key. Basically, this serves as the primary key, which records can be deduped by.                 |
+| `dynamo_db_config` | Specify the target DynamoDB table and hash_key. Basically, this serves as the primary key, which records can be deduped by.                  |
 
 ### Updating API Mapping Config
 
