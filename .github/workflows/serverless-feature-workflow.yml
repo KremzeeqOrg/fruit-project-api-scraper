@@ -49,7 +49,7 @@ jobs:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
     - run: |
-        echo "can-deploy=${{steps.preview_label_check.outputs.can-deploy}}" >> "$GITHUB_OUTPUT"
+        echo "can-deploy=${{steps.deploy_label_check.outputs.can-deploy}}" >> "$GITHUB_OUTPUT"
         echo "can-deploy - ${can-deploy}"
 
   serverless-feature-deploy:
@@ -58,7 +58,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.can-deploy == 'deploy' }}
+    if: ${{ needs.label-check.outputs.can-deploy == 'success' }}
     steps:
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
