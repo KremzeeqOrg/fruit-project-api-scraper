@@ -59,7 +59,7 @@ jobs:
     - name: "Docker Build and push to AWS ECR"
       env:
         AWS_ECR: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
-        IMAGE_SHA_TAG: ${{ env.APP }}:pr-${{ github.sha }}
+        IMAGE_SHA_TAG: ${{ env.APP }}:pr_${{ github.sha }}
         IMAGE_LATEST_TAG: ${{ env.APP }}:latest
       run: |
         docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}/${{ env.IMAGE_SHA_TAG }} .
