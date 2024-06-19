@@ -12,6 +12,7 @@ Python API scraper designed to be deployed as an AWS lambda, to support an ETL w
 - [App Overview](#app-overview)S
 - [Summary of App modules](#summary-of-app-modules)
 - [Orchestration](#orchestration)
+  - [GitHub Actions Workflow](#github-actions-workflow)
 - [Running code locally](#running-code-locally)
   - [Prerequisites](#prerequisites)
   - [Steps](#steps)
@@ -58,7 +59,7 @@ src
 
 ## Orchestration
 
-- When code is merged to the `main` branch, this triggers a GitHub Actions workflow [here](.github/workflows/serverless-workflow.yml)
+- When code is merged to the `main` branch, this triggers a GitHub Actions workflow [here](.github/workflows/serverless-workflow.yml). See [here]() to understand configuration requirements for this.
 - This executes unit tests, followed by a [serverless](https://www.serverless.com/framework) framework deployment of resources defined in the [serverless.yml](./serverless.yml) file.
 - The workflow runs a `docker build` and `docker push` of the app artifact to AWS ECR.
 - The `serverless.yml` configuration:
@@ -73,6 +74,26 @@ In AWS you can execute the AWS Lambda (e.g. `fruit-project-api-scraper-dev`), di
 ```
 
 Alternatively, you can execute AWS Step Functions state machine (e.g. `fruit-project-api-scraper-state-machine`), which entails 3 successive executions of the scraper application. This execution takes 8-9 seconds.
+
+### GitHub Actions Workflow
+
+- The [GitHub Actions workflow](.github/workflows/serverless-workflow.yml) requires a review of variables set for `env` at the top of the file.
+
+<details>
+<summary>Example</summary>
+```
+  TEST_DIR: "src/tests"
+  PYTHON_VERSION: '3.10'
+  NODE_VERSION: 20
+  AWS_REGION: "eu-west-2"
+  APP: "fruit-project-api-scraper"
+  ENV: dev
+```
+</details>
+
+- It also requires GitHub secrets to be set for:
+  - `AWS_GITHUB_ACTIONS_ROLE`: This is a AWS IAM role with a trust policy, which enables GitHub as a OIDC provider to assume the role with certain permissions. A policy should also be attached to the role, applying the pinciple of 'least privilige'. Please consult this [AWS blog](https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/) for further guidance.
+  - `SERVERLESS_ACCESS_KEY`: A Serverless Access Key can be created on [serverless](https://www.serverless.com/framework) website when logged in.
 
 ## Running code locally
 
