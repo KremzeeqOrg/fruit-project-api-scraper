@@ -7,17 +7,21 @@ Python API scraper designed to be deployed as an AWS lambda, to support an ETL w
 
 ## Contents
 
-- [App Overview](#App Overview)
-- [Summary of App modules](#Summary of App modules)
-- [Orchestration](#Orchestration)
-- [Running code locally](#Running code locally)
-  - [Prerequisites](#Prerequisites)
-  - [Steps](#Steps)
-  - [Running tests](#Running tests)
-- [Appendix](#Appendix)
-  - [Setting up AWS SSM Parameter for target API](#Setting up AWS SSM Parameter for target API)
-  - [Updating API Mapping Config](#Updating API Mapping Config)
-  - [Test Record Retieval from AWS DynamoDB](#Test Record Retieval from AWS DynamoDB)
+<details>
+
+- [App Overview](#app-overview)S
+- [Summary of App modules](#summary-of-app-modules)
+- [Orchestration](#orchestration)
+- [Running code locally](#running-code-locally)
+  - [Prerequisites](#prerequisites)
+  - [Steps](#steps)
+  - [Running tests](#running-tests)
+- [Appendix](#appendix)
+  - [Setting up AWS SSM Parameter for target API](#setting-up-aws-ssm-parameter-for-target-api)
+  - [Updating API Mapping Config](#updating-api-mapping-config)
+  - [Test Record Retrieval from AWS DynamoDB](#test-record-retrieval-from-aws-dynamodb)
+
+</details>
 
 ## App Overview
 
@@ -29,8 +33,8 @@ Python API scraper designed to be deployed as an AWS lambda, to support an ETL w
 
 - When you setup your SSM parameter, this should have the format: `${app}--{sourceApiScraper}-config`.
 - The parameter serves as an external configuration file with environment variables fetched during runtime.
-- More info on this [here](# Setting up AWS SSM Parameter for target API)
-- There is also [additional API mapping configuration](#Updating API Mapping Config) which can be updated to define scraping rules for the target API.
+- More info on this [here](#setting-up-aws-ssm-parameter-for-target-api)
+- There is also [additional API mapping configuration](#updating-api-mapping-config) which can be updated to define scraping rules for the target API.
 
 - Once the SSM parameter is fetched by the application, it scrapes api records from an external target API.
 - It then transforms the api records so that only desired fields are kept and a timestamp is added for each record.
@@ -84,7 +88,7 @@ Alternatively, you can execute AWS Step Functions state machine (e.g. `fruit-pro
 
 1. In AWS, setup AWS SSM Parameter with config for scraping a target api. Also, setup any target AWS Dynamo DB tables, with a specification for the hash key. Please see [here](#Setting up AWS SSM Parameter for target API) for more info on this.
 
-2. Review the API Mapping Config [here](#Updating API Mapping Config). If the `api_name` is not listed for your target API, you will need to update thsi config.
+2. Review the API Mapping Config [here](#updating-api-mapping-config). If the `api_name` is not listed for your target API, you will need to update this config.
 
 3. Setup and activate a virtual Python environment and run `pip install -r requirements.txt` in the `src` directory
 
