@@ -86,7 +86,7 @@ Alternatively, you can execute AWS Step Functions state machine (e.g. `fruit-pro
 
 2. Review the API Mapping Config [here](#Updating API Mapping Config). If the `api_name` is not listed for your target API, you will need to update thsi config.
 
-3. Setup and activate a virtual Python environment and run `pip install - requirements.txt` in the `src` directory
+3. Setup and activate a virtual Python environment and run `pip install -r requirements.txt` in the `src` directory
 
 4. In the app [handler](./src/handler.py), uncomment the event and update the event dictionary with desired values. This simulates the payload which would otherwise be sent to the lambda in AWS.
 
