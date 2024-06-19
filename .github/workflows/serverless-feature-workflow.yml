@@ -50,6 +50,7 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
     - run: |
         echo "can-deploy=${{steps.deploy_label_check.outputs.can-deploy}}" >> "$GITHUB_OUTPUT"
+        echo "value of can-deploy"
         echo "can-deploy - ${can-deploy}"
 
   serverless-feature-deploy:
