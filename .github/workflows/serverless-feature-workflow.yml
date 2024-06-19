@@ -2,9 +2,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'src/*'
-      - '.github/workflows/serverless-feature-workflow.yml'
     types: [labeled, opened, edited]
     
 env:
