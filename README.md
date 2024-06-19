@@ -107,7 +107,7 @@ Alternatively, you can execute AWS Step Functions state machine (e.g. `fruit-pro
 
 ### Steps
 
-1. In AWS, setup AWS SSM Parameter with config for scraping a target api. Also, setup any target AWS Dynamo DB tables, with a specification for the hash key. Please see [here](#Setting up AWS SSM Parameter for target API) for more info on this.
+1. In AWS, setup AWS SSM Parameter with config for scraping a target API. Also, setup any target AWS Dynamo DB tables, with a specification for the hash key. Please see [here](#Setting up AWS SSM Parameter for target API) for more info on this.
 
 2. Review the API Mapping Config [here](#updating-api-mapping-config). If the `api_name` is not listed for your target API, you will need to update this config.
 
@@ -121,7 +121,7 @@ Alternatively, you can execute AWS Step Functions state machine (e.g. `fruit-pro
 
 - With your virtual environment activated, run: `pytest -vv ./src/tests/`
 
-Note: Tests are run, with imports from [helper files](./src/helper_files/). This contains samples for AWS Parameter Store parameters and also for fetched sample_api records from target apis.
+Note: Tests are run, with imports from [helper files](./src/helper_files/). This contains samples for AWS Parameter Store parameters and also for fetched sample_api records from target APIs.
 
 ## Appendix
 
