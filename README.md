@@ -12,7 +12,7 @@ Python API scraper designed to be deployed as an AWS lambda, to support an ETL w
 - [App Overview](#app-overview)S
 - [Summary of App modules](#summary-of-app-modules)
 - [Orchestration](#orchestration)
-  - [GitHub Actions Workflow](#github-actions-workflow)
+  - [GitHub Actions Workflow Configuration](#github-actions-workflow)
 - [Running code locally](#running-code-locally)
   - [Prerequisites](#prerequisites)
   - [Steps](#steps)
@@ -26,20 +26,21 @@ Python API scraper designed to be deployed as an AWS lambda, to support an ETL w
 
 ## App Overview
 
-- All code for the scraper can be found [here](./src)
-
-- At runtime, the scraper application looks up a AWS SSM Parameter based on these variables: `app` and `sourceApiName`
-- `app`: Application name e.g. `fruit-project-api-scraper`
-- `sourceApiName`: The name of the target API you would like to scrape.
-
-- When you setup your SSM parameter, this should have the format: `${app}--{sourceApiScraper}-config`.
-- The parameter serves as an external configuration file with environment variables fetched during runtime.
-- More info on this [here](#setting-up-aws-ssm-parameter-for-target-api)
-- There is also [additional API mapping configuration](#updating-api-mapping-config) which can be updated to define scraping rules for the target API.
+At runtime, the scraper application looks up a AWS SSM Parameter based on these variables: - `app`: Application name e.g. `fruit-project-api-scraper` - `sourceApiName`: The name of the target API you would like to scrape.
 
 - Once the SSM parameter is fetched by the application, it scrapes api records from an external target API.
 - It then transforms the api records so that only desired fields are kept and a timestamp is added for each record.
 - All records are uploaded in batches to a target table in DynamoDB.
+
+<details>
+
+<summary>Overview on Configuation</summary>
+
+- When you setup your SSM parameter, the parameter name should have the format: `${app}--{sourceApiScraper}-config`.
+- The parameter provides environment variables in a json fetched during runtime. More info on this [here](#setting-up-aws-ssm-parameter-for-target-api)
+- There is also [additional API mapping configuration](#updating-api-mapping-config) which can be updated to define scraping rules for target APIs.
+
+</details>
 
 ## Summary of App modules
 
@@ -59,7 +60,8 @@ src
 
 ## Orchestration
 
-- When code is merged to the `main` branch, this triggers a GitHub Actions workflow [here](.github/workflows/serverless-workflow.yml). See [here]() to understand configuration requirements for this.
+- When code is merged to the `main` branch, this triggers a GitHub Actions workflow [here](.github/workflows/serverless-workflow.yml).
+- See [here](#github-actions-workflow-configuration) to understand configuration requirements for this.
 - This executes unit tests, followed by a [serverless](https://www.serverless.com/framework) framework deployment of resources defined in the [serverless.yml](./serverless.yml) file.
 - The workflow runs a `docker build` and `docker push` of the app artifact to AWS ECR.
 - The `serverless.yml` configuration:
@@ -75,7 +77,7 @@ In AWS you can execute the AWS Lambda (e.g. `fruit-project-api-scraper-dev`), di
 
 Alternatively, you can execute AWS Step Functions state machine (e.g. `fruit-project-api-scraper-state-machine`), which entails 3 successive executions of the scraper application. This execution takes 8-9 seconds.
 
-### GitHub Actions Workflow
+### GitHub Actions Workflow Configuration
 
 - The [GitHub Actions workflow](.github/workflows/serverless-workflow.yml) requires a review of variables set for `env` at the top of the file.
 
@@ -127,9 +129,10 @@ Note: Tests are run, with imports from [helper files](./src/helper_files/). This
 
 ### Setting up AWS SSM Parameter for target API
 
-- The SSM Parameter can be populated with a JSON. When fetching the parameter, the application is agnostic to whether the parameter is stored as a string or secure string. Here's an example of a JSON
+- The SSM Parameter can be populated with a JSON. When fetching the parameter, the application is agnostic to whether the parameter is stored as a string or secure string.
 
-e.g.:
+<details>
+<summary>Example</summary>
 
 ```
 {
@@ -145,6 +148,11 @@ e.g.:
 }
 ```
 
+</details>
+
+<details>
+
+<summary>Understanding fields in parameter</summary>
 Understanding fields in parameter:
 
 | Field              | Explanation                                                                                                                                  |
@@ -154,6 +162,8 @@ Understanding fields in parameter:
 | `endpoint`         | Target API endpoint to scrape.                                                                                                               |
 | `required_fields`  | Specify all the fields you would like to preserve for scraped records. Fields not specified are removed as part of the transformation stage. |
 | `dynamo_db_config` | Specify the target DynamoDB table and hash_key. Basically, this serves as the primary key, which records can be deduped by.                  |
+
+</details>
 
 ### Updating API Mapping Config
 
@@ -165,7 +175,8 @@ Here, apps are listed with `api_groups`. You can see that `api-groups` are mappe
 
 ### Test Record Retieval from AWS DynamoDB
 
-Example:
+<details>
+<summary>Example</summary>
 
 ```
 aws dynamodb get-item \
@@ -173,3 +184,5 @@ aws dynamodb get-item \
     --key '{"name": {"N": "Strawberry"}}' \
 
 ```
+
+</details>
