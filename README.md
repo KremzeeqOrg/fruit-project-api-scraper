@@ -12,7 +12,7 @@ Python API scraper designed to be deployed as an AWS lambda, to support an ETL w
 - [App Overview](#app-overview)S
 - [Summary of App modules](#summary-of-app-modules)
 - [Orchestration](#orchestration)
-  - [GitHub Actions Workflow Configuration](#github-actions-workflow)
+  - [GitHub Actions Workflow Configuration](#github-actions-workflow-configuration)
 - [Running code locally](#running-code-locally)
   - [Prerequisites](#prerequisites)
   - [Steps](#steps)
@@ -152,7 +152,7 @@ Note: Tests are run, with imports from [helper files](./src/helper_files/). This
 
 <details>
 
-<summary>Understanding fields in parameter</summary>
+<summary>Understanding fields in SSM parameter</summary>
 Understanding fields in parameter:
 
 | Field              | Explanation                                                                                                                                  |
