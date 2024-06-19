@@ -122,7 +122,7 @@ e.g.:
 
 Understanding fields in parameter:
 
-| Field Explanation  |
+| Field              | Explanation                                                                                                                                  |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `source_api`       | This should be the same as `sourceApiName`.                                                                                                  |
 | `auth_header`      | Some apis may require an authorization header specifying a key and authentication token. It can be populated as "{}" if it is not needed.    |
