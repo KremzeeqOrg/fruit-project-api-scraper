@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "serverless-prune-plugin": "^2.0.2",
-    "serverless-step-functions": "^3.21.0"
+    "serverless-step-functions": "^3.21.0",
+    "serverless-plugin-git-variables": "^5.2.0"
   }
 }

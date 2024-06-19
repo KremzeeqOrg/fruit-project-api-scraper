@@ -6,7 +6,7 @@ frameworkVersion: '3'
 plugins:
   - serverless-prune-plugin
   - serverless-step-functions
-
+  - serverless-plugin-git-variables
 
 params:
   default:
@@ -41,7 +41,7 @@ provider:
 
   iam:
     role:
-      name: ${self:service}-lambda-role
+      name: ${self:service}-lambda-role-${sls:stage}
       statements:
         - Effect: "Allow"
           Action:
