@@ -7,6 +7,7 @@ plugins:
   - serverless-prune-plugin
   - serverless-step-functions
 
+
 params:
   default:
     table1: 'fruit'
@@ -18,6 +19,10 @@ params:
     functionName: '${self:service}-${sls:stage}'
     dynamoDbArnPrefix: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
     lambdaArnPrefix: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
+  dev:
+    tag: pr-${git:sha1}
+  prod:
+    tag: latest
      
 provider:
   name: aws
@@ -25,7 +30,7 @@ provider:
   ecr:
     images:
       appImage:
-        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:latest
+        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:${params.tag}
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
@@ -66,7 +71,7 @@ functions:
 stepFunctions:
   stateMachines:
     projectStateMachine:
-      name: ${self:service}-state-machine
+      name: ${self:service}-state-machine-${sls:stage}
       definition:
         Comment: "State Machine to chain executions of fruit-project-api-scraper"
         StartAt: FruitTableUpdate
