@@ -33,11 +33,12 @@ jobs:
       continue-on-error: true
     - name: Test with pytest
       run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
-  sls-deploy:
+      
+  serverless-deploy:
     permissions:
       id-token: write
       contents: read
-    name: "Serverless Deploy"
+    name: "Serverless Deploy to Prod"
     needs: pytest
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
