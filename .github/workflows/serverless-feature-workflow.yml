@@ -49,8 +49,9 @@ jobs:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
     - run: |
-        echo "deploy=${{steps.preview_label_check.outputs.can-deploy}}" >> "$GITHUB_OUTPUT"
-        echo "deploy - ${deploy}"
+        deploy=
+        echo "can-deploy=${{steps.preview_label_check.outputs.can-deploy}}" >> "$GITHUB_OUTPUT"
+        echo "can-deploy - ${can-deploy}"
 
   serverless-feature-deploy:
     needs: [pytest, label-check]
