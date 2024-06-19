@@ -4,7 +4,7 @@ on:
       - main
     paths:
       - 'src/*'
-      - '.github/workflows/serverless-workflow.yml'
+      - '.github/workflows/serverless-feature-workflow.yml'
     types: [labeled]
     
 env:
