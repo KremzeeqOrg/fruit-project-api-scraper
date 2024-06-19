@@ -41,6 +41,8 @@ jobs:
   label-check:
     name: "Check Deploy Label"
     runs-on: ubuntu-latest
+    outputs:
+      can-deploy: ${{ steps.deploy_label_check.outputs.can-deploy }}
     steps:
     - uses: actions/checkout@v4
     - id: deploy_label_check
@@ -49,9 +51,11 @@ jobs:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
     - run: |
-        echo "can-deploy=${{steps.deploy_label_check.outputs.can-deploy}}" >> "$GITHUB_OUTPUT"
-        echo "value of can-deploy"
-        echo "can-deploy - ${can-deploy}"
+        if [ "${{ steps.deploy_label_check.outputs.can-deploy }}" == "deploy" ]; then
+          echo "can-deploy=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "can-deploy=false" >> "$GITHUB_OUTPUT"
+        fi
 
   serverless-feature-deploy:
     needs: [pytest, label-check]
@@ -59,7 +63,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.can-deploy == 'deploy' }}
+    if: ${{ needs.label-check.outputs.can-deploy == 'true' }}
     steps:
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
