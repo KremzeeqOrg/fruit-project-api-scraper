@@ -5,7 +5,7 @@ on:
     paths:
       - 'src/*'
       - '.github/workflows/serverless-feature-workflow.yml'
-    types: [labeled]
+    types: [labeled, opened, edited]
     
 env:
   TEST_DIR: "src/tests"
