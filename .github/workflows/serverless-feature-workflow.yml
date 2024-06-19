@@ -37,7 +37,7 @@ jobs:
       continue-on-error: true
     - name: Test with pytest
       run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
-      
+
   label-check:
     name: "Check Deploy Label"
     runs-on: ubuntu-latest
@@ -48,7 +48,9 @@ jobs:
       with:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-    - run: echo "deploy=steps.preview_label_check.outputs.can-deploy" >> "$GITHUB_OUTPUT"
+    - run: |
+        echo "deploy=${{steps.preview_label_check.outputs.can-deploy}}" >> "$GITHUB_OUTPUT"
+        echo "deploy - ${deploy}"
 
   serverless-feature-deploy:
     needs: [pytest, label-check]
