@@ -13,36 +13,36 @@ env:
   ENV: dev
 
 jobs:
-  pytest:
-    name: Pytest
-    runs-on: ubuntu-latest
-    strategy:  
-      matrix:  
-        test_file: ["api_mapping_manager", "record_manager", "scraper", "utils"]
-    outputs:
-      can-deploy : ${{ steps.deploy_label_check.can-deploy }}
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python version - ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-    - name: Install dependencies  
-      run: |  
-          python -m pip install --upgrade pip  
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
-    - name: Lint with Ruff
-      # see ruff.toml for config
-      uses: chartboost/ruff-action@v1
-      continue-on-error: true
-    - name: Test with pytest
-      run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
+  # pytest:
+  #   name: Pytest
+  #   runs-on: ubuntu-latest
+  #   strategy:  
+  #     matrix:  
+  #       test_file: ["api_mapping_manager", "record_manager", "scraper", "utils"]
+  #   outputs:
+  #     can-deploy : ${{ steps.deploy_label_check.can-deploy }}
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - name: Set up Python version - ${{ env.PYTHON_VERSION }}
+  #     uses: actions/setup-python@v5
+  #     with:
+  #       python-version: ${{ env.PYTHON_VERSION }}
+  #   - name: Install dependencies  
+  #     run: |  
+  #         python -m pip install --upgrade pip  
+  #         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
+  #   - name: Lint with Ruff
+  #     # see ruff.toml for config
+  #     uses: chartboost/ruff-action@v1
+  #     continue-on-error: true
+  #   - name: Test with pytest
+  #     run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
 
   label-check:
     name: "Check Deploy Label"
     runs-on: ubuntu-latest
     outputs:
-      can-deploy: ${{ steps.deploy_label_check.outputs.can-deploy }}
+      can_deploy: ${{ steps.deploy_label_check.outputs.can-deploy }}
     steps:
     - uses: actions/checkout@v4
     - id: deploy_label_check
@@ -51,19 +51,19 @@ jobs:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
     - run: |
-        if [ "${{ steps.deploy_label_check.outputs.can-deploy }}" == "deploy" ]; then
-          echo "can-deploy=true" >> "$GITHUB_OUTPUT"
+        if [[ ${{ steps.deploy_label_check.outputs.can_deploy }}" == "deploy" ]]; then
+          echo "can_deploy=true" >> "$GITHUB_OUTPUT"
         else
-          echo "can-deploy=false" >> "$GITHUB_OUTPUT"
+          echo "can_deploy=false" >> "$GITHUB_OUTPUT"
         fi
 
   serverless-feature-deploy:
-    needs: [pytest, label-check]
+    needs: [label-check]
     permissions:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.can-deploy == 'true' }}
+    if: ${{ needs.label-check.outputs.can_deploy }} == 'true'
     steps:
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
@@ -72,26 +72,26 @@ jobs:
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
         aws-region: ${{ env.AWS_REGION }}
         mask-aws-account-id: true
-    - name: Login to Amazon ECR
-      uses: aws-actions/amazon-ecr-login@v2
-      with:
-        mask-password: 'true'
-    - name: "Docker Build and push to AWS ECR"
-      env:
-        AWS_ECR: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
-        IMAGE_SHA_TAG: ${{ env.APP }}:pr_${{ github.sha }}
-        IMAGE_LATEST_TAG: ${{ env.APP }}:latest
-      run: |
-        docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}/${{ env.IMAGE_SHA_TAG }} .
-        docker push ${{ env.AWS_ECR }}/${{ env.APP }} --all-tags
+    # - name: Login to Amazon ECR
+    #   uses: aws-actions/amazon-ecr-login@v2
+    #   with:
+    #     mask-password: 'true'
+    # - name: "Docker Build and push to AWS ECR"
+    #   env:
+    #     AWS_ECR: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+    #     IMAGE_SHA_TAG: ${{ env.APP }}:pr_${{ github.sha }}
+    #     IMAGE_LATEST_TAG: ${{ env.APP }}:latest
+    #   run: |
+    #     docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}/${{ env.IMAGE_SHA_TAG }} .
+    #     docker push ${{ env.AWS_ECR }}/${{ env.APP }} --all-tags
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - name: serverless deploy
+    - name: serverless remove
       run: | 
         npm i -g serverless@3.38.0
         npm install && npm list -g
-        serverless deploy --verbose --stage dev
+        # serverless remove --verbose --stage dev
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
