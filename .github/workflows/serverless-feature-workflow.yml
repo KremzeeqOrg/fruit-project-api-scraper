@@ -64,9 +64,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    env:
-      CAN_DEPLOY: ${{ needs.label-check.outputs.can_deploy }}
-    if: ${{ env.CAN_DEPLOY }} == true
+    if: ${{ needs.label-check.outputs.can_deploy }} == true
     steps:
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
