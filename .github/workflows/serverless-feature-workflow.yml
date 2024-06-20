@@ -51,7 +51,8 @@ jobs:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
     - run: |
-        if [[ ${{ steps.deploy_label_check.outputs.can_deploy }}" == "deploy" ]]; then
+        if [[ ${{ steps.deploy_label_check.outputs.can_deploy }} == "deploy" ]]; then
+
           echo "can_deploy=true" >> "$GITHUB_OUTPUT"
         else
           echo "can_deploy=false" >> "$GITHUB_OUTPUT"
