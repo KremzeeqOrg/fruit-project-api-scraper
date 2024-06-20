@@ -6,7 +6,6 @@ frameworkVersion: '3'
 plugins:
   - serverless-prune-plugin
   - serverless-step-functions
-  - serverless-plugin-git-variables
 
 params:
   default:
@@ -19,10 +18,6 @@ params:
     functionName: '${self:service}-${sls:stage}'
     dynamoDbArnPrefix: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
     lambdaArnPrefix: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
-  dev:
-    tag: pr_${git:sha1}
-  prod:
-    tag: latest
      
 provider:
   name: aws
@@ -30,7 +25,7 @@ provider:
   ecr:
     images:
       appImage:
-        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:${params.tag}
+        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:latest
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
@@ -41,7 +36,7 @@ provider:
 
   iam:
     role:
-      name: ${self:service}-lambda-role-${sls:stage}
+      name: ${self:service}-lambda-role
       statements:
         - Effect: "Allow"
           Action:
@@ -71,7 +66,7 @@ functions:
 stepFunctions:
   stateMachines:
     projectStateMachine:
-      name: ${self:service}-state-machine-${sls:stage}
+      name: ${self:service}-state-machine
       definition:
         Comment: "State Machine to chain executions of fruit-project-api-scraper"
         StartAt: FruitTableUpdate
@@ -128,3 +123,135 @@ custom:
   prune:
     automatic: true
     number: 3
+
+
+
+
+# service: fruit-project-api-scraper
+# frameworkVersion: '3'
+
+# plugins:
+#   - serverless-prune-plugin
+#   - serverless-step-functions
+#   - serverless-plugin-git-variables
+
+# params:
+#   default:
+#     table1: 'fruit'
+#     table2: 'cocktail-recipes'
+#     table3: 'food-recipes'
+#     targetApi1: 'fruity-vice'
+#     targetApi2: 'the-cocktail-db'
+#     targetApi3: 'the-meal-db'
+#     functionName: '${self:service}-${sls:stage}'
+#     dynamoDbArnPrefix: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
+#     lambdaArnPrefix: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
+#   dev:
+#     tag: pr_${git:sha1}
+#   prod:
+#     tag: latest
+     
+# provider:
+#   name: aws
+#   runtime: python3.10
+#   ecr:
+#     images:
+#       appImage:
+#         uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:${params.tag}
+#   region: eu-west-2
+#   runtimeManagement: auto
+#   memorySize: 512
+#   timeout: 10
+#   environment:
+#     APP: ${self:service}
+#     SOURCE_API_NAME: ${param:targetApi1}
+
+#   iam:
+#     role:
+#       name: ${self:service}-lambda-role-${sls:stage}
+#       statements:
+#         - Effect: "Allow"
+#           Action:
+#             - dynamodb:DescribeTable
+#             - dynamodb:Query
+#             - dynamodb:Scan
+#             - dynamodb:GetItem
+#             - dynamodb:PutItem
+#             - dynamodb:UpdateItem
+#             - dynamodb:DeleteItem
+#             - dynamodb:BatchWriteItem
+#           Resource:
+#             - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table1}
+#             - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table2}
+#             - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table3}
+#         - Effect: "Allow"
+#           Action:
+#             - ssm:GetParameter
+#           Resource: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${self:service}--*
+
+# functions:
+#   app:
+#     name: ${param:functionName}
+#     runtime: python3.10
+#     image: appImage
+
+# stepFunctions:
+#   stateMachines:
+#     projectStateMachine:
+#       name: ${self:service}-state-machine-${sls:stage}
+#       definition:
+#         Comment: "State Machine to chain executions of fruit-project-api-scraper"
+#         StartAt: FruitTableUpdate
+#         States:
+#           FruitTableUpdate:
+#             Next: CocktailTableUpdate
+#             Type: Task
+#             Resource: arn:aws:states:::lambda:invoke
+#             Catch:
+#             - ErrorEquals: ["States.ALL"]
+#               ResultPath: $.errorInfo
+#               Next: ScrapingFailed
+#             Parameters:
+#               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+#               Payload:
+#                 app: ${self:service}
+#                 sourceApiName: ${param:targetApi1}
+#           CocktailTableUpdate:
+#             Next: FoodTableUpdate
+#             Type: Task
+#             Resource: arn:aws:states:::lambda:invoke
+#             Catch:
+#             - ErrorEquals: ["States.ALL"]
+#               ResultPath: $.errorInfo
+#               Next: ScrapingFailed
+#             Parameters:
+#               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+#               Payload:
+#                 app: ${self:service}
+#                 sourceApiName: ${param:targetApi2}
+#           FoodTableUpdate:
+#             Next: ScrapingSucessful
+#             Type: Task
+#             Resource: arn:aws:states:::lambda:invoke
+#             Catch:
+#             - ErrorEquals: ["States.ALL"] 
+#               ResultPath: $.errorInfo
+#               Next: ScrapingFailed
+#             Parameters:
+#               FunctionName: ${param:lambdaArnPrefix}:${param:functionName}
+#               Payload:
+#                 app: ${self:service}
+#                 sourceApiName: ${param:targetApi3}
+#           ScrapingFailed:
+#             Type: Fail
+#             Cause: "Scraping process failed"
+#             Error: "Error Encountered during scraping"
+#           ScrapingSucessful:
+#             Type: Pass
+#             Result: "All target apis scraped"
+#             End: true
+
+# custom:
+#   prune:
+#     automatic: true
+#     number: 3
