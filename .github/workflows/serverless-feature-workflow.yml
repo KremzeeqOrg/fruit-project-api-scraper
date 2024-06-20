@@ -51,7 +51,7 @@ jobs:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
     - run: |
-        if [[ ${{ steps.deploy_label_check.outputs.can_deploy }} == "deploy" ]]; then
+        if [[ ${{ steps.deploy_label_check.outputs.label_check }} == "success" ]]; then
 
           echo "can_deploy=true" >> "$GITHUB_OUTPUT"
         else
@@ -64,7 +64,9 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.can_deploy }} == 'true'
+    env:
+      CAN_DEPLOY: ${{ needs.label-check.outputs.can_deploy }}
+    if: ${{ env.CAN_DEPLOY }} == true
     steps:
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
