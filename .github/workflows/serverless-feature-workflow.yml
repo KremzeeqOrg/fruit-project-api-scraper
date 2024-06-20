@@ -85,6 +85,7 @@ jobs:
     #   run: |
     #     docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}/${{ env.IMAGE_SHA_TAG }} .
     #     docker push ${{ env.AWS_ECR }}/${{ env.APP }} --all-tags
+    - uses: actions/checkout@v4
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v4
       with:
