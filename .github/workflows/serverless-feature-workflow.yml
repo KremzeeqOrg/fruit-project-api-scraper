@@ -85,7 +85,6 @@ jobs:
       run: |
         sha_short=$(git rev-parse --short HEAD)
         "image_sha_tag=feature-${sha_short}" >> $GITHUB_OUTPUT
-        # Pushing more than 1 tag for the image can cause issues for the image reference in the serverless.yml file
         docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}/${image_sha_tag} .
         docker push ${{ env.AWS_ECR }}/${{ env.APP }} --all-tags
     - name: Use Node.js ${{ env.NODE_VERSION }}
