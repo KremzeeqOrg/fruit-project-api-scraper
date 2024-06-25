@@ -137,7 +137,7 @@ jobs:
         sha_short=$(git rev-parse --short HEAD)
         image_sha_tag=develop-${sha_short}
         echo "image_sha_tag=${image_sha_tag}" >> $GITHUB_OUTPUT
-        tag=${{ env.AWS_ECR }}/${image_sha_tag}
+        tag=${{ env.AWS_ECR }}:${image_sha_tag}
 
         docker build --platform linux/amd64 -t ${tag} .
         docker push ${{ env.AWS_ECR }} --all-tags
