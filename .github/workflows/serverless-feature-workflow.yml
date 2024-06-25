@@ -256,7 +256,7 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
         mask-aws-account-id: true
     - name: Delete stack
-      uses: go-to-k/delstack@1.8.0
+      uses: go-to-k/delstack@v1.8.0
       with:
         stack-name: ${{ env.APP }}-feature
         region: ${{ secrets.AWS_REGION }}
