@@ -17,12 +17,6 @@ params:
     functionName: '${self:service}-${sls:stage}'
     dynamoDbArnPrefix: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
     lambdaArnPrefix: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
-  feature:
-    tag: feature
-  dev:
-    tag: latest
-  prod:
-    tag: latest
      
 provider:
   name: aws
