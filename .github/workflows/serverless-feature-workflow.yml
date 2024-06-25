@@ -189,14 +189,14 @@ jobs:
     - name: "Docker Build and push to AWS ECR"
       id: docker-push
       env:
-        AWS_ECR: ${{ secrets.FRUIT_PROJECT_PROD_AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}
+        AWS_ECR: ${{ secrets.FRUIT_PROJECT_PROD_AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.APP }}
       run: |
         latest_tag=${{ env.APP }}:latest
         echo "latest_tag=${latest_tag}" >> $GITHUB_OUTPUT
 
         docker_hub_latest_tag=${{ secrets.DOCKERHUB_USERNAME }}/${latest_tag}
         docker pull $docker_hub_latest_tag
-        docker tag $docker_hub_latest_tag -t ${{ env.AWS_ECR }}:latest
+        docker tag $docker_hub_latest_tag ${{ env.AWS_ECR }}:latest
         docker push ${{ env.AWS_ECR }}:latest
 
     - name: Use Node.js ${{ env.NODE_VERSION }}
