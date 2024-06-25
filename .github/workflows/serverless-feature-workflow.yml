@@ -137,15 +137,12 @@ jobs:
         sha_short=$(git rev-parse --short HEAD)
         image_sha_tag=develop-${sha_short}
         echo "image_sha_tag=${image_sha_tag}" >> $GITHUB_OUTPUT
-        tag=${{ env.AWS_ECR }}:${image_sha_tag}
+        aws_tag=${{ env.AWS_ECR }}:${image_sha_tag}
+        docker_hub_tag=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.APP }}:latest
 
-        docker build --platform linux/amd64 -t ${tag} .
-        docker push ${{ env.AWS_ECR }} --all-tags
-        id=$(docker images -q ${tag})
-        latest_tag=${{ env.APP }}:latest
-        docker_hub_latest_tag=${{ secrets.DOCKERHUB_USERNAME }}/${latest_tag}
-        docker ${id} tag ${docker_hub_latest_tag}
-        docker push ${docker_hub_latest_tag}
+        docker build --platform linux/amd64 -t ${aws_tag} -t ${docker_hub_tag} .
+        docker push ${aws_tag}
+        docker push ${docker_hub_tag}
 
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v4
