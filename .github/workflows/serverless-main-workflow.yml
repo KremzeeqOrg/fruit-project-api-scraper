@@ -5,8 +5,8 @@ on:
 env:
   TEST_DIR: "src/tests"
   NODE_VERSION: 20
-  PYTHON_VERSION: 3.10
-  SERVERLESS_VERSION: 3.38.0
+  PYTHON_VERSION: '3.10'
+  SERVERLESS_VERSION: '3.38.0'
   APP: "fruit-project-api-scraper"
 
 jobs:
