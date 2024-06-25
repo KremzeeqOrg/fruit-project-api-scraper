@@ -4,7 +4,6 @@ frameworkVersion: '3'
 plugins:
   - serverless-prune-plugin
   - serverless-step-functions
-  - serverless-plugin-git-variables
 
 params:
   default:

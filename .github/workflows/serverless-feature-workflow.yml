@@ -59,6 +59,7 @@ jobs:
         fi
 
   serverless-feature-deploy:
+    name: "Serverless Feature Deploy to Dev"
     needs: [label-check]
     permissions:
       id-token: write
@@ -102,10 +103,10 @@ jobs:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
   serverless-deploy-to-dev:
+    name: "Serverless Deploy to Dev"
     permissions:
       id-token: write
       contents: read
-    name: "Serverless Deploy to Dev"
     #needs: pytest
     needs: [serverless-feature-deploy ]
     runs-on: ubuntu-latest
@@ -117,7 +118,7 @@ jobs:
       with:
         role-to-assume: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ACCESS_ROLE }}
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: ${{ secrets.AWS_REGION }}
         mask-aws-account-id: true
     - name: Login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v2
@@ -160,10 +161,10 @@ jobs:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
   serverless-deploy-to-prod:
+    name: "Serverless Deploy to Prod"
     permissions:
       id-token: write
       contents: read
-    name: "Serverless Deploy to Prod"
     #needs: pytest
     needs: [serverless-deploy-to-dev]
     runs-on: ubuntu-latest
@@ -175,7 +176,7 @@ jobs:
       with:
         role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE }}
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: ${{ secrets.AWS_REGION }}
         mask-aws-account-id: true
     - name: Login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v2
