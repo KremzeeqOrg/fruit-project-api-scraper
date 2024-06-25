@@ -84,7 +84,8 @@ jobs:
         AWS_ECR: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}
       run: |
         sha_short=$(git rev-parse --short HEAD)
-        echo "image_sha_tag=feature-${sha_short}" >> $GITHUB_OUTPUT
+        image_sha_tag=feature-${sha_short}
+        echo "image_sha_tag=${image_sha_tag}" >> $GITHUB_OUTPUT
         docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}:${image_sha_tag} .
         docker push ${{ env.AWS_ECR }} --all-tags
     - name: Use Node.js ${{ env.NODE_VERSION }}
