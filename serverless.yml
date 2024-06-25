@@ -1,5 +1,3 @@
-# serverless.yml
-
 service: fruit-project-api-scraper
 frameworkVersion: '3'
 
@@ -25,7 +23,7 @@ provider:
   ecr:
     images:
       appImage:
-        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:latest
+        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:${param:tag}
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
@@ -36,7 +34,7 @@ provider:
 
   iam:
     role:
-      name: ${self:service}-lambda-role
+      name: ${self:service}-lambda-role-${sls:stage}
       statements:
         - Effect: "Allow"
           Action:
@@ -66,9 +64,9 @@ functions:
 stepFunctions:
   stateMachines:
     projectStateMachine:
-      name: ${self:service}-state-machine
+      name: ${self:service}-state-machine-${sls:stage}
       definition:
-        Comment: "State Machine to chain executions of fruit-project-api-scraper"
+        Comment: "State Machine to chain executions of fruit-project-api-scraper for ${sls:stage}"
         StartAt: FruitTableUpdate
         States:
           FruitTableUpdate:

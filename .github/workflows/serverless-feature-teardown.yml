@@ -1,0 +1,54 @@
+on:
+  pull_request:
+    branches:
+      - closed
+
+env:
+  APP: "fruit-project-api-scraper"
+  ENV: feature
+
+jobs:
+  label-check:
+    permissions:
+      id-token: write
+      contents: read
+    name: "Teardown Serverless Cloudformation Stack"
+    runs-on: ubuntu-latest
+    outputs:
+      deployed: ${{ steps.deploy_label_check.outputs.can-deploy }}
+    steps:
+    - id: deploy_label_check
+      uses: docker://agilepathway/pull-request-label-checker:latest
+      with:
+        one_of: deploy
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+    - run: |
+        if [[ ${{ steps.deploy_label_check.outputs.label_check }} == "success" ]]; then
+
+          echo "deployed=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "deployed=false" >> "$GITHUB_OUTPUT"
+        fi
+
+  feature-cloudformation-stack-teardown:
+    needs: [label-check]
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    if: ${{ needs.label-check.outputs.can_deploy }} == true
+    outputs:
+      issue_payload: ${{ steps.deploy_label_check.outputs.can-deploy }}
+    steps:
+    - name: Set AWS context
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ACCESS_ROLE }}
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ secrets.AWS_REGION }}
+        mask-aws-account-id: true
+    - name: Delete stack
+      uses: go-to-k/delstack@v1.8.0
+      with:
+        stack-name: ${{ env.APP }}-feature
+        region: ${{ secrets.AWS_REGION }}

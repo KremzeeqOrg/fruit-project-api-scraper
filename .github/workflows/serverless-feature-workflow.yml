@@ -1,0 +1,109 @@
+on:
+  pull_request:
+    branches:
+      - main
+    types: [labeled, opened, synchronize, reopened]
+
+concurrency:
+  group: feature
+  cancel-in-progress: true
+    
+env:
+  ENV: feature
+  TEST_DIR: "src/tests"
+  NODE_VERSION: 20
+  PYTHON_VERSION: '3.10'
+  SERVERLESS_VERSION: '3.38.0'
+  APP: "fruit-project-api-scraper"
+
+jobs:
+  pytest:
+    name: Pytest
+    runs-on: ubuntu-latest
+    strategy:  
+      matrix:  
+        test_file: ["api_mapping_manager", "record_manager", "scraper", "utils"]
+    outputs:
+      can-deploy : ${{ steps.deploy_label_check.can-deploy }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python version - ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Install dependencies  
+      run: |  
+          python -m pip install --upgrade pip  
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
+    - name: Lint with Ruff
+      # see ruff.toml for config
+      uses: chartboost/ruff-action@v1
+      continue-on-error: true
+    - name: Test with pytest
+      run: pytest -vv ${{ env.TEST_DIR }}/test_${{ matrix.test_file }}.py
+
+  label-check:
+    name: "Check Deploy Label"
+    runs-on: ubuntu-latest
+    outputs:
+      can_deploy: ${{ steps.deploy_label_check.outputs.can-deploy }}
+    steps:
+    - uses: actions/checkout@v4
+    - id: deploy_label_check
+      uses: docker://agilepathway/pull-request-label-checker:latest
+      with:
+        one_of: deploy
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+    - run: |
+        if [[ ${{ steps.deploy_label_check.outputs.label_check }} == "success" ]]; then
+          echo "can_deploy=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "can_deploy=false" >> "$GITHUB_OUTPUT"
+        fi
+
+  serverless-feature-deploy:
+    name: "Serverless Feature Deploy to Dev"
+    needs: [pytest, label-check]
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    if: ${{ needs.label-check.outputs.can_deploy }} == true
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set AWS context
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ACCESS_ROLE }}
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ secrets.AWS_REGION }}
+        mask-aws-account-id: true
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
+        mask-password: 'true'
+    - name: "Docker Build and push to AWS ECR"
+      id: docker-push
+      env:
+        AWS_ECR: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}
+      run: |
+        sha_short=$(git rev-parse --short HEAD)
+        image_sha_tag=feature-${sha_short}
+        echo "image_sha_tag=${image_sha_tag}" >> $GITHUB_OUTPUT
+        docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}:${image_sha_tag} .
+        docker push ${{ env.AWS_ECR }} --all-tags
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - name: serverless deploy
+      run: | 
+        npm i -g serverless@${{ env.SERVERLESS_VERSION }}
+        npm install && npm list -g
+        tag_arg="tag=${{ steps.docker-push.outputs.image_sha_tag }}"
+        serverless deploy --stage ${{ env.ENV }} --param=${tag_arg}
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+
+
+
