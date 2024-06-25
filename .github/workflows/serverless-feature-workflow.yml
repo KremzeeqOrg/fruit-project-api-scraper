@@ -74,7 +74,10 @@ jobs:
             echo "github.sha"
             echo ${{ github.sha }}
             echo "GITHUB_HEAD_REF"
-            echo ${{ github.GITHUB_HEAD_REF }}
+            echo $GITHUB_HEAD_REF
+            image_tag=${{ env.APP }}:${{ GITHUB_HEAD_REF }}
+            echo "image tag"
+            echo $image_tag
             
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
@@ -89,7 +92,7 @@ jobs:
         mask-password: 'true'
     - name: "Docker Build and push to AWS ECR"
       env:
-        IMAGE_SHA_TAG: ${{ env.APP }}:${{ github.GITHUB_HEAD_REF }}
+        IMAGE_SHA_TAG: ${{ env.APP }}:${{ GITHUB_HEAD_REF }}
         IMAGE_LATEST_TAG: ${{ env.APP }}:latest
       run: |
         # docker pull ${{ env.AWS_ECR }}/${{ env.IMAGE_LATEST_TAG }}
