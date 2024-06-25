@@ -2,6 +2,11 @@ on:
   push:
     branches:
       - main
+
+concurrency:
+  group: main
+  cancel-in-progress: true
+
 env:
   TEST_DIR: "src/tests"
   NODE_VERSION: 20
@@ -95,8 +100,7 @@ jobs:
       id-token: write
       contents: read
     environment: prod
-    #needs: pytest
-    needs: [serverless-deploy-to-dev]
+    needs: [pytest, serverless-deploy-to-dev]
     runs-on: ubuntu-latest
     # if: github.ref == 'refs/heads/main'
     steps:
