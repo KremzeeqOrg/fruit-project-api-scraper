@@ -107,7 +107,7 @@ jobs:
       contents: read
     name: "Serverless Deploy to Dev"
     #needs: pytest
-    needs: serverless-feature-deploy 
+    needs: [serverless-feature-deploy ]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
@@ -134,7 +134,8 @@ jobs:
         AWS_ECR: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}
       run: |
         sha_short=$(git rev-parse --short HEAD)
-        echo "image_sha_tag=develop-${sha_short}" >> $GITHUB_OUTPUT
+        image_sha_tag=develop-${sha_short}
+        echo "image_sha_tag=${image_sha_tag}" >> $GITHUB_OUTPUT
         tag=${{ env.AWS_ECR }}/${image_sha_tag}
 
         docker build --platform linux/amd64 -t ${tag} .
@@ -164,7 +165,7 @@ jobs:
       contents: read
     name: "Serverless Deploy to Prod"
     #needs: pytest
-    needs: serverless-deploy-to-dev
+    needs: [serverless-deploy-to-dev]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
