@@ -81,9 +81,14 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v2
       with:
         mask-password: 'true'
+    - name: Set outputs
+      id: vars
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+    - name: Check outputs
+      run: echo ${{ steps.vars.outputs.sha_short }}
     - name: "Docker Build and push to AWS ECR"
       env:
-        IMAGE_SHA_TAG: ${{ env.APP }}:${{ github.head_ref }}
+        IMAGE_SHA_TAG: ${{ env.APP }}:${{ steps.vars.outputs.sha_short }}
         IMAGE_LATEST_TAG: ${{ env.APP }}:latest
       run: |
         # docker pull ${{ env.AWS_ECR }}/${{ env.IMAGE_LATEST_TAG }}
@@ -97,10 +102,8 @@ jobs:
       run: | 
         npm i -g serverless@${{ env.SERVERLESS_VERSION }}
         npm install && npm list -g
-        tag_arg="tag=${{ github.head_ref }}""
-        echo "tag_arg"
-        echo $tag_arg
-        serverless deploy --stage ${{ env.SERVERLESS_VERSION }} --param=$tag_arg
+        tag_arg="tag=${{ steps.vars.outputs.sha_short }}"
+        serverless deploy --stage ${{ env.SERVERLESS_VERSION }} --param=${tag_arg}
         # serverless remove --verbose --stage ${{ env.SERVERLESS_VERSION }}
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
