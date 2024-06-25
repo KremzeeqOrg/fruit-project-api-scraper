@@ -192,15 +192,13 @@ jobs:
         AWS_ECR: ${{ secrets.FRUIT_PROJECT_PROD_AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.APP }}
       run: |
         latest_tag=${{ env.APP }}:latest
-        echo "latest_tag=${latest_tag}" >> $GITHUB_OUTPUT
-
         docker_hub_latest_tag=${{ secrets.DOCKERHUB_USERNAME }}/${latest_tag}
         docker pull $docker_hub_latest_tag
         if [ $? -ne 0 ]; then
           echo "Docker pull failed. Image not found: $docker_hub_latest_tag"
           exit 1
         fi
-        docker tag ${docker_hub_latest_tag} ${AWS_ECR}:latest
+        docker tag ${docker_hub_latest_tag} ${latest_tag}
         docker push ${{ env.AWS_ECR }}:latest
 
     - name: Use Node.js ${{ env.NODE_VERSION }}
@@ -211,10 +209,10 @@ jobs:
       run: | 
         npm i -g serverless@${{ env.SERVERLESS_VERSION }}
         npm install && npm list -g
-        tag_arg="tag=${{ steps.docker-push.outputs.latest_tag }}"
+        tag_arg="tag=latest"
         echo "tag_arg"
         echo ${tag_arg}
-        
+
         serverless deploy --stage prod --param=${tag_arg}
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
