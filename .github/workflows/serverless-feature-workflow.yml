@@ -107,6 +107,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    environment: dev
     #needs: pytest
     # needs: [serverless-feature-deploy ]
     runs-on: ubuntu-latest
@@ -162,6 +163,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    environment: prod
     #needs: pytest
     needs: [serverless-deploy-to-dev]
     runs-on: ubuntu-latest
@@ -187,14 +189,14 @@ jobs:
     - name: "Docker Build and push to AWS ECR"
       id: docker-push
       env:
-        AWS_ECR: ${{ secrets.FRUIT_PROJECT_PROD_AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+        AWS_ECR: ${{ secrets.FRUIT_PROJECT_PROD_AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}
       run: |
         latest_tag=${{ env.APP }}:latest
         echo "latest_tag=${latest_tag}" >> $GITHUB_OUTPUT
 
         docker_hub_latest_tag=${{ secrets.DOCKERHUB_USERNAME }}/${latest_tag}
         docker pull $docker_hub_latest_tag
-        docker push ${{ env.AWS_ECR }}/${latest_tag} --all-tags
+        docker push ${{ env.AWS_ECR }}:latest
 
     - name: Use Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v4
