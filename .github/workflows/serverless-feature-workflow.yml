@@ -68,6 +68,14 @@ jobs:
     if: ${{ needs.label-check.outputs.can_deploy }} == true
     steps:
     - uses: actions/checkout@v4
+    - run: |
+            echo "directories"
+            ls -la
+            echo "github.sha"
+            echo ${{ github.sha }}
+            echo "GITHUB_HEAD_REF"
+            echo ${{ GITHUB_HEAD_REF }}
+            
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -81,7 +89,7 @@ jobs:
         mask-password: 'true'
     - name: "Docker Build and push to AWS ECR"
       env:
-        IMAGE_SHA_TAG: ${{ env.APP }}:pr-${{ github.sha }}
+        IMAGE_SHA_TAG: ${{ env.APP }}:${{ GITHUB_HEAD_REF }}
         IMAGE_LATEST_TAG: ${{ env.APP }}:latest
       run: |
         # docker pull ${{ env.AWS_ECR }}/${{ env.IMAGE_LATEST_TAG }}
