@@ -18,7 +18,7 @@ params:
     dynamoDbArnPrefix: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table"
     lambdaArnPrefix: 'arn:aws:lambda:${aws:region}:${aws:accountId}:function'
   feature:
-    tag: ${git:branch}
+    tag: feature
   dev:
     tag: latest
   prod:
