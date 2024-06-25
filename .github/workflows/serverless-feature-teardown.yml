@@ -2,7 +2,6 @@ on:
   pull_request:
     branches:
       - closed
-    # types: [labeled]
 
 env:
   APP: "fruit-project-api-scraper"
@@ -29,7 +28,8 @@ jobs:
           echo "deployed=true" >> "$GITHUB_OUTPUT"
         else
           echo "deployed=false" >> "$GITHUB_OUTPUT"
-        fi   
+        fi
+
   feature-cloudformation-stack-teardown:
     needs: [label-check]
     permissions:
@@ -47,25 +47,8 @@ jobs:
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
         aws-region: ${{ secrets.AWS_REGION }}
         mask-aws-account-id: true
-    - name: AWS CLI v2
-      uses: imehedi/actions-awscli-v2@latest
-    - id: teardown
-      run : |
-        stack_name=${{ env.APP }}-${{ env.ENV }}
-        aws cloudformation delete-stack --stack-name $stack_name --deletion-mode FORCE_DELETE_STACK
-        echo "Review any retained resources with the status DELETE_SKIPPED"
-        payload=$(aws cloudformation list-stack-resources --stack-name ${stack_name})
-        echo "payload=$payload" >> "$GITHUB_OUTPUT"
-  raise-issue:
-    needs: [feature-cloudformation-stack-teardown]
-    permissions:
-      id-token: write
-      issues: write
-      contents: read
-    runs-on: ubuntu-latest
-    if: ${{ needs.feature-cloudformation-stack-teardown.outputs.payload }} != ""
-    steps:
-    - uses: actions/checkout@v3
-    - uses: JasonEtco/create-an-issue@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Delete stack
+      uses: go-to-k/delstack@v1.8.0
+      with:
+        stack-name: ${{ env.APP }}-feature
+        region: ${{ secrets.AWS_REGION }}
