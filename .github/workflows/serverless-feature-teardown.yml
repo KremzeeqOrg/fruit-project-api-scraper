@@ -1,7 +1,8 @@
 on:
   pull_request:
     branches:
-      - closed
+      - main
+    types: [closed]
 
 env:
   APP: "fruit-project-api-scraper"
@@ -9,6 +10,7 @@ env:
 
 jobs:
   label-check:
+    if: ${{ github.event.pull_request.merged }}
     permissions:
       id-token: write
       contents: read
