@@ -70,7 +70,7 @@ jobs:
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE }}
+        role-to-assume: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ACCESS_ROLE }}
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
         aws-region: ${{ secrets.AWS_REGION }}
         mask-aws-account-id: true
