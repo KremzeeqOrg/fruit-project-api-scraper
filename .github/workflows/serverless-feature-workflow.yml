@@ -196,6 +196,7 @@ jobs:
 
         docker_hub_latest_tag=${{ secrets.DOCKERHUB_USERNAME }}/${latest_tag}
         docker pull $docker_hub_latest_tag
+        docker tag $docker_hub_latest_tag -t ${{ env.AWS_ECR }}:latest
         docker push ${{ env.AWS_ECR }}:latest
 
     - name: Use Node.js ${{ env.NODE_VERSION }}
