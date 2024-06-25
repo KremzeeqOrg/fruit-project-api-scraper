@@ -83,7 +83,7 @@ jobs:
         IMAGE_SHA_TAG: ${{ env.APP }}:pr_${{ github.sha }}
         IMAGE_LATEST_TAG: ${{ env.APP }}:latest
       run: |
-        docker pull ${{ env.AWS_ECR }}/${{ env.IMAGE_LATEST_TAG }}
+        # docker pull ${{ env.AWS_ECR }}/${{ env.IMAGE_LATEST_TAG }}
         docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}/${{ env.IMAGE_SHA_TAG }} .
         docker push ${{ env.AWS_ECR }}/${{ env.APP }} --all-tags
     - uses: actions/checkout@v4
