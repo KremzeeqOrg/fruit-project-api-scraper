@@ -94,7 +94,7 @@ jobs:
         mask-password: 'true'
     - name: "Docker Build and push to AWS ECR"
       env:
-        IMAGE_SHA_TAG: ${{ env.APP }}:${{ GITHUB_HEAD_REF }}
+        IMAGE_SHA_TAG: ${{ env.APP }}:${{ env.GITHUB_HEAD_REF }}
         IMAGE_LATEST_TAG: ${{ env.APP }}:latest
       run: |
         # docker pull ${{ env.AWS_ECR }}/${{ env.IMAGE_LATEST_TAG }}
