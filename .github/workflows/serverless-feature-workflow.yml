@@ -83,7 +83,7 @@ jobs:
         mask-password: 'true'
     - name: "Docker Build and push to AWS ECR"
       env:
-        IMAGE_SHA_TAG: ${{ env.APP }}:feature
+        IMAGE_SHA_TAG: ${{ env.APP }}:${{ github.head_ref }}
         IMAGE_LATEST_TAG: ${{ env.APP }}:latest
       run: |
         # docker pull ${{ env.AWS_ECR }}/${{ env.IMAGE_LATEST_TAG }}
@@ -97,7 +97,8 @@ jobs:
       run: | 
         npm i -g serverless@${{ env.SERVERLESS_VERSION }}
         npm install && npm list -g
-        serverless deploy --stage ${{ env.SERVERLESS_VERSION }}
+        tag_arg=
+        serverless deploy --stage ${{ env.SERVERLESS_VERSION }} --param="tag=${{ github.head_ref }}"
         # serverless remove --verbose --stage ${{ env.SERVERLESS_VERSION }}
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
