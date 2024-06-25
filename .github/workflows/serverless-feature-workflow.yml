@@ -109,7 +109,7 @@ jobs:
     #needs: pytest
     needs: [serverless-feature-deploy ]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
     steps:
     - uses: actions/checkout@v4
     - name: Set AWS context
@@ -167,7 +167,7 @@ jobs:
     #needs: pytest
     needs: [serverless-deploy-to-dev]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
     steps:
     - uses: actions/checkout@v4
     - name: Set AWS context
