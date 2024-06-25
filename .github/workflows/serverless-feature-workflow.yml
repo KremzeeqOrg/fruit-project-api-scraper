@@ -73,11 +73,13 @@ jobs:
             ls -la
             echo "github.sha"
             echo ${{ github.sha }}
-            echo "GITHUB_HEAD_REF"
-            echo $GITHUB_HEAD_REF
-            image_tag=${{ env.APP }}:${{ GITHUB_HEAD_REF }}
+            echo "github.github_head_ref"
+            echo ${{ github.github_head_ref }}
+            image_tag=${{ env.APP }}:${{ github.github_head_ref }}
             echo "image tag"
             echo $image_tag
+            echo "env.GITHUB_HEAD_REF"
+            echo ${{ env.GITHUB_HEAD_REF }}
             
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
