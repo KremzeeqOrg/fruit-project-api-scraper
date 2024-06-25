@@ -255,8 +255,6 @@ jobs:
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
         aws-region: ${{ secrets.AWS_REGION }}
         mask-aws-account-id: true
-    - name: AWS CLI v2
-      uses: imehedi/actions-awscli-v2@latest
     - id: teardown
       run : |
         stack_name=${{ env.APP }}-${{ env.ENV }}
