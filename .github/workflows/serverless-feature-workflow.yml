@@ -196,7 +196,11 @@ jobs:
 
         docker_hub_latest_tag=${{ secrets.DOCKERHUB_USERNAME }}/${latest_tag}
         docker pull $docker_hub_latest_tag
-        docker tag $docker_hub_latest_tag ${{ env.AWS_ECR }}:latest
+        if [ $? -ne 0 ]; then
+          echo "Docker pull failed. Image not found: $docker_hub_latest_tag"
+          exit 1
+        fi
+        docker tag $docker_hub_latest_tag $AWS_ECR:latest
         docker push ${{ env.AWS_ECR }}:latest
 
     - name: Use Node.js ${{ env.NODE_VERSION }}
