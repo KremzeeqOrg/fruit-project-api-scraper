@@ -2,36 +2,70 @@ on:
   pull_request:
     branches:
       - closed
-    types: [labeled]
+    # types: [labeled]
 
 env:
-  TEST_DIR: "src/tests"
-  PYTHON_VERSION: '3.10'
-  NODE_VERSION: 20
-  AWS_REGION: "eu-west-2"
   APP: "fruit-project-api-scraper"
-  ENV: dev
+  ENV: feature
 
 jobs:
-  teardown:
+  label-check:
     permissions:
       id-token: write
       contents: read
-    name: "Serverless Remove"
+    name: "Teardown Serverless Cloudformation Stack"
     runs-on: ubuntu-latest
-    if: ${{ github.event.label.name == 'deploy' }} || ${{ github.event.action == 'closed' }}
+    outputs:
+      deployed: ${{ steps.deploy_label_check.outputs.can-deploy }}
     steps:
-    - uses: actions/checkout@v4
+    - id: deploy_label_check
+      uses: docker://agilepathway/pull-request-label-checker:latest
+      with:
+        one_of: deploy
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+    - run: |
+        if [[ ${{ steps.deploy_label_check.outputs.label_check }} == "success" ]]; then
+
+          echo "deployed=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "deployed=false" >> "$GITHUB_OUTPUT"
+        fi   
+  feature-cloudformation-stack-teardown:
+    needs: [label-check]
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    if: ${{ needs.label-check.outputs.can_deploy }} == true
+    outputs:
+      issue_payload: ${{ steps.deploy_label_check.outputs.can-deploy }}
+    steps:
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE }}
+        role-to-assume: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ACCESS_ROLE }}
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: ${{ secrets.AWS_REGION }}
         mask-aws-account-id: true
-    - name: serverless teardown
-      run: | 
-        npm i -g serverless@3.38.0
-        serverless remove --verbose --stage dev
+    - name: AWS CLI v2
+      uses: imehedi/actions-awscli-v2@latest
+    - id: teardown
+      run : |
+        stack_name=${{ env.APP }}-${{ env.ENV }}
+        aws cloudformation delete-stack --stack-name $stack_name --deletion-mode FORCE_DELETE_STACK
+        echo "Review any retained resources with the status DELETE_SKIPPED"
+        payload=$(aws cloudformation list-stack-resources --stack-name ${stack_name})
+        echo "payload=$payload" >> "$GITHUB_OUTPUT"
+  raise-issue:
+    needs: [feature-cloudformation-stack-teardown]
+    permissions:
+      id-token: write
+      issues: write
+      contents: read
+    runs-on: ubuntu-latest
+    if: ${{ needs.feature-cloudformation-stack-teardown.outputs.payload }} != ""
+    steps:
+    - uses: actions/checkout@v3
+    - uses: JasonEtco/create-an-issue@v2
       env:
-        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
