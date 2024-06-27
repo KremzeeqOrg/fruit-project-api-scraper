@@ -19,6 +19,7 @@ jobs:
     uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-unit-test-workflow.yml@main
     with:
       environment: feature
+      test_file: ${{ matrix.test_file }}
 
   label-check:
     name: "Check Deploy Label"
