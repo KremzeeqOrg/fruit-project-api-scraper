@@ -7,7 +7,7 @@ on:
 
 jobs:
   serverless-deploy:
-    name: "Serverless Deploy for ${{ env.ENV }}"
+    name: "Serverless Deploy for ${{ vars.ENV }}"
     needs: [label-check]
     permissions:
       id-token: write
@@ -30,23 +30,23 @@ jobs:
     - name: "Docker push to AWS ECR"
       id: docker-push
       env:
-        AWS_ECR: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.APP }}
+        AWS_ECR: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ vars.APP }}
       run: |
         tag=""
         aws_tag="${{ env.AWS_ECR }}:latest"
-        docker_hub_tag="${{ secrets.DOCKERHUB_USERNAME }}/${{ env.APP }}:latest"
+        docker_hub_tag="${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.APP }}:latest"
 
-        if [ "${{ env.ENV }}" == 'feature' ] || [ "${{ env.ENV }}" == 'dev' ]; then
+        if [ "${{ vars.ENV }}" == 'feature' ] || [ "${{ vars.ENV }}" == 'dev' ]; then
           sha_short=$(git rev-parse --short HEAD)
-          tag="${{ env.ENV }}-${sha_short}"
+          tag="${{ vars.ENV }}-${sha_short}"
           aws_tag="${{ env.AWS_ECR }}:${tag}"
           docker build --platform linux/amd64 -t "$aws_tag" .
           docker push "$aws_tag"
-          if [ "${{ env.ENV }}" == 'dev' ]; then
+          if [ "${{ vars.ENV }}" == 'dev' ]; then
             docker tag "$aws_tag" "$docker_hub_tag"
             docker push "$docker_hub_tag"
           fi
-        elif [ "${{ env.ENV }}" == 'prod' ]; then
+        elif [ "${{ vars.ENV }}" == 'prod' ]; then
           docker pull "$docker_hub_tag"
           if [ $? -ne 0 ]; then
             echo "Docker pull failed. Image not found: ${docker_hub_tag}"
@@ -65,7 +65,7 @@ jobs:
         npm i -g serverless@${{ env.SERVERLESS_VERSION }}
         npm install && npm list -g
         image_uri="imageURI=${{ steps.docker-push.outputs.imageURI }}"
-        serverless deploy --stage ${{ env.ENV }} --param=${image_uri}
+        serverless deploy --stage ${{ vars.ENV }} --param=${image_uri}
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
