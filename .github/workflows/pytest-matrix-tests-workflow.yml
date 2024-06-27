@@ -12,14 +12,11 @@ jobs:
   pytest:
     name: Pytest Matrix Tests
     runs-on: ubunti-latest
-    strategy:  
-      matrix:  
-        test_file: ${{ fromJson(inputs.test_file) }}
     steps:
     - uses: actions/checkout@v4
-      # with:
-      #   ref: ${{ github.event.workflow_call.head_sha }}
-      #   repository: ${{ github.repository }}
+      with:
+        ref: ${{ github.event.workflow_call.head_sha }}
+        repository: ${{ github.repository }}
     - name: Set up Python version - ${{ vars.PYTHON_VERSION }}
       uses: actions/setup-python@v5
       with:
@@ -29,4 +26,4 @@ jobs:
           python -m pip install --upgrade pip  
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with pytest
-      run: pytest -vv ${{ vars.PYTEST_TEST_DIR }}/test_${{ matrix.test_file }}.py
+      run: pytest -vv ${{ vars.PYTEST_TEST_DIR }}/test_${{ inputs.test_file }}.py

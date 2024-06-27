@@ -21,10 +21,13 @@ jobs:
     name: Pytest
     permissions:
       contents: read
+    strategy:  
+      matrix:  
+        test_file: ${{ fromJson(['"api_mapping_manager", "record_manager", "scraper", "utils"]') }}
     uses: ./.github/workflows/pytest-matrix-tests-workflow.yml
     with:
       environment: feature
-      test_files: "['api_mapping_manager', 'record_manager', 'scraper', 'utils']"
+      test_files: ${{ matrix.test_file }}
 
   # label-check:
   #   name: "Check Deploy Label"
