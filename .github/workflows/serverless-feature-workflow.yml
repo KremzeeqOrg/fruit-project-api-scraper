@@ -23,7 +23,7 @@ jobs:
     #   contents: read
     strategy:  
       matrix:  
-        test_file: ["api_mapping_manager", "record_manager", "scraper", "utils"]
+        test_file: [api_mapping_manager, record_manager, scraper, utils]
     uses: ./.github/workflows/pytest-matrix-tests-workflow.yml
     with:
       environment: feature
