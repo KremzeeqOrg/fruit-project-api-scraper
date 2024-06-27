@@ -21,7 +21,7 @@ jobs:
     name: Pytest
     # permissions:
     #   contents: read
-    uses: ./.github/workflows/pytest-matrix-tests-workflow.yml@eature/pytest-reusable-workflow
+    uses: ./.github/workflows/pytest-matrix-tests-workflow.yml
     with:
       environment: feature
 
