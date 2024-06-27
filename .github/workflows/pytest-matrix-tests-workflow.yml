@@ -14,7 +14,7 @@ jobs:
     runs-on: ubunti-latest
     strategy:  
       matrix:  
-        test_file: ${{ vars.PYTEST_TEST_FILES }}
+        test_file: ${{ fromJSON(${{ vars.PYTEST_TEST_FILES }})}}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -29,4 +29,4 @@ jobs:
           python -m pip install --upgrade pip  
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with pytest
-      run: pytest -vv ${{ vars.PYTEST_TEST_DIR }}/test_${{ inputs.test_file }}.py
+      run: pytest -vv ${{ vars.PYTEST_TEST_DIR }}/test_${{ matrix.test_file }}.py
