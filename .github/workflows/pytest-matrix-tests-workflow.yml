@@ -14,7 +14,7 @@ jobs:
     runs-on: ubunti-latest
     strategy:  
       matrix:  
-        test_file: ${{ echo '["api_mapping_manager", "record_manager", "scraper", "utils"]' | xargs }}
+        test_file: ["api_mapping_manager", "record_manager", "scraper", "utils"]
     steps:
     - uses: actions/checkout@v4
       with:
