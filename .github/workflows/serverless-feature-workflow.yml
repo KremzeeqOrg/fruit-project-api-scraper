@@ -23,7 +23,7 @@ jobs:
         test_file: ${{ fromJson('["api_mapping_manager", "record_manager", "scraper", "utils"]') }}
     uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-unit-test-workflow.yml@main
     with:
-      environment: ${{ env.ENV }}
+      environment: feature
       test_file: ${{ matrix.test_file }}
     
   label-check:
