@@ -32,28 +32,27 @@ jobs:
     # needs: [pytest]
     runs-on: ubuntu-latest
     outputs:
-      can_deploy: ${{ steps.set_ouput.outputs.can-deploy }}
+      can_deploy: ${{ steps.set_output.outputs.can_deploy }}
     steps:
-    - uses: actions/checkout@v4
-    - name: Lint with Ruff
-      # see ruff.toml for config
-      uses: chartboost/ruff-action@v1
-      continue-on-error: true
-    - id: deploy_label_check
-      uses: docker://agilepathway/pull-request-label-checker:latest
-      with:
-        one_of: deploy
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        allow_failure: true
-    - id : set_output
-      run: |
-        echo "label_check"
-        echo ${{ steps.deploy_label_check.outputs.label_check }}
-        if [[ ${{ steps.deploy_label_check.outputs.label_check }} == "success" ]]; then
-          echo "can_deploy=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "can_deploy=false" >> "$GITHUB_OUTPUT"
-        fi
+      - uses: actions/checkout@v4
+      - name: Lint with Ruff
+        uses: chartboost/ruff-action@v1
+        continue-on-error: true
+      - id: deploy_label_check
+        uses: docker://agilepathway/pull-request-label-checker:latest
+        with:
+          one_of: deploy
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          allow_failure: true
+      - id: set_output
+        run: |
+          echo "label_check"
+          echo ${{ steps.deploy_label_check.outputs.label_check }}
+          if [[ "${{ steps.deploy_label_check.outputs.label_check }}" == "success" ]]; then
+            echo "can_deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "can_deploy=false" >> "$GITHUB_OUTPUT"
+          fi
 
   serverless-feature-deploy:
     name: "Serverless Feature Deploy to Dev"
@@ -62,13 +61,13 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.can_deploy }} == true
+    if: ${{ needs.label-check.outputs.can_deploy }} == 'true'
     steps:
-    - uses: actions/checkout@v4
-    - name: "label-check"
-      run:  |
-        echo "label-check"
-        echo ${{ needs.label-check.outputs.can_deploy }}
+      - uses: actions/checkout@v4
+      - name: "label-check"
+        run: |
+          echo "label-check"
+          echo ${{ needs.label-check.outputs.can_deploy }}
     # - name: Set AWS context
     #   uses: aws-actions/configure-aws-credentials@v4
     #   with:
