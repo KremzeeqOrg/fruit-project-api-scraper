@@ -41,6 +41,7 @@ jobs:
       with:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
+      continue-on-error: true
     - run: |
         if [[ ${{ steps.deploy_label_check.outputs.label_check }} == "success" ]]; then
           echo "can_deploy=true" >> "$GITHUB_OUTPUT"
