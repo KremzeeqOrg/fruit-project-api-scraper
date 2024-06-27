@@ -24,7 +24,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    uses: ./.github/workflows/serverless-deploy-workflow.yml@main
+    uses: ./.github/workflows/serverless-deploy-workflow.yml
     with:
       environment: feature
 
