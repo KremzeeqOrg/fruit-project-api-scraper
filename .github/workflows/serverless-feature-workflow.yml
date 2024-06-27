@@ -49,9 +49,9 @@ jobs:
           echo "label_check"
           echo ${{ steps.deploy_label_check.outputs.label_check }}
           if [[ "${{ steps.deploy_label_check.outputs.label_check }}" == "success" ]]; then
-            echo "can_deploy='true'" >> "$GITHUB_OUTPUT"
+            echo "can_deploy=true" >> "$GITHUB_OUTPUT"
           else
-            echo "can_deploy='false'" >> "$GITHUB_OUTPUT"
+            echo "can_deploy=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Output debug
         run: |
@@ -64,8 +64,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    if: ${{ needs.label-check.outputs.can_deploy }}
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.can_deploy }} == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: "label-check"
