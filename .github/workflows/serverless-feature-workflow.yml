@@ -18,16 +18,20 @@ env:
 
 jobs:
   pytest:
+    runs-on: ubuntu-latest
     name: Pytest
     permissions:
       contents: read
+    steps: 
+    - run: echo 'hello'
     # strategy:  
     #   matrix:  
     #     test_file: ${{ fromJson('["api_mapping_manager", "record_manager", "scraper", "utils"]') }}
-    uses: ./.github/workflows/pytest-matrix-tests-workflow.yml
-    with:
-      environment: feature
+    # uses: ./.github/workflows/pytest-matrix-tests-workflow.yml
+    # with:
+    #   environment: feature
       # test_file: ${{ matrix.test_file }}
+    
 
   # label-check:
   #   name: "Check Deploy Label"
