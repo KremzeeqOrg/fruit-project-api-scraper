@@ -19,8 +19,8 @@ env:
 jobs:
   pytest:
     name: Pytest
-    # permissions:
-    #   contents: read
+    permissions:
+      contents: read
     uses: ./.github/workflows/pytest-matrix-tests-workflow.yml
     with:
       environment: feature
