@@ -32,7 +32,7 @@ jobs:
     # needs: [pytest]
     runs-on: ubuntu-latest
     outputs:
-      can_deploy: ${{ steps.deploy_label_check.outputs.can-deploy }}
+      can_deploy: ${{ steps.set_ouput.outputs.can-deploy }}
     steps:
     - uses: actions/checkout@v4
     - name: Lint with Ruff
@@ -45,7 +45,8 @@ jobs:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         allow_failure: true
-    - run: |
+    - id : set_output
+      run: |
         echo "label_check"
         echo ${{ steps.deploy_label_check.outputs.label_check }}
         if [[ ${{ steps.deploy_label_check.outputs.label_check }} == "success" ]]; then
@@ -61,7 +62,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.can_deploy }} == "true"
+    if: ${{ needs.label-check.outputs.can_deploy }} == true
     steps:
     - uses: actions/checkout@v4
     - name: "label-check"
