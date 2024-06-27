@@ -12,7 +12,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    environment: ${{ env.ENV }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
