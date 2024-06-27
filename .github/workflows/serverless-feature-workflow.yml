@@ -19,11 +19,39 @@ jobs:
     uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-unit-test-workflow.yml@main
     with:
       environment: feature
+
+  label-check:
+    name: "Check Deploy Label"
+    needs: [pytest]
+    runs-on: ubuntu-latest
+    outputs:
+      can_deploy: ${{ steps.set_output.outputs.can_deploy }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint with Ruff
+        uses: chartboost/ruff-action@v1
+        continue-on-error: true
+      - id: deploy_label_check
+        uses: docker://agilepathway/pull-request-label-checker:latest
+        with:
+          one_of: deploy
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          allow_failure: true
+      - id: set_output
+        run: |
+          if [[ "${{ steps.deploy_label_check.outputs.label_check }}" == "success" ]]; then
+            echo "can_deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "can_deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+      
   serverless-deploy:
     name: Serverless Deploy
+    needs: [ label-check ]
     permissions:
       id-token: write
       contents: read
+    if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
     uses: ./.github/workflows/serverless-deploy-workflow.yml
     with:
       environment: feature

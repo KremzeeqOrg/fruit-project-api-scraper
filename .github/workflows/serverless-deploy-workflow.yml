@@ -4,19 +4,15 @@ on:
       environment:
         type: string
         required: true
-      deploy:
-        type: string
-        required: true
 
 jobs:
   serverless-deploy:
-    name: "Serverless Feature Deploy to Dev"
+    name: "Serverless Deploy for ${{ env.ENV }}"
     needs: [label-check]
     permissions:
       id-token: write
       contents: read
-    environment: feature
-    if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
+    environment: ${{ env.ENV }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
