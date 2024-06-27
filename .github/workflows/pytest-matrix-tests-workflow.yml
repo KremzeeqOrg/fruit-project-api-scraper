@@ -8,10 +8,12 @@ on:
         type: string
         required: true
 
+
 jobs:
   pytest:
     name: Pytest Test
     runs-on: ubuntu-latest
+    environment : ${{ inputs.environment }}
     steps:
     - uses: actions/checkout@v4
       with:
