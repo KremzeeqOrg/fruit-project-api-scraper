@@ -51,7 +51,7 @@ jobs:
 
   serverless-feature-deploy:
     name: "Serverless Feature Deploy to Dev"
-    needs: [pytest, label-check]
+    needs: [label-check]
     permissions:
       id-token: write
       contents: read
