@@ -27,7 +27,7 @@ jobs:
     uses: ./.github/workflows/pytest-matrix-tests-workflow.yml
     with:
       environment: feature
-      target: ${{ matrix.test_file }}
+      test_file: ${{ matrix.test_file }}
 
   # label-check:
   #   name: "Check Deploy Label"
