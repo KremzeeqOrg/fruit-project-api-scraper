@@ -22,7 +22,7 @@ jobs:
     strategy:  
       matrix:  
         test_file: ${{ fromJson('["api_mapping_manager", "record_manager", "scraper", "utils"]') }}
-    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-matrix-tests-workflow.yml@feature/add-pytest-unit-test-workflow.yml
+    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-unit-test-workflow.yml@feature/add-pytest-unit-test-workflow.yml
     with:
       environment: feature
       test_file: ${{ matrix.test_file }}
