@@ -10,10 +10,8 @@ concurrency:
     
 env:
   ENV: feature
-  TEST_DIR: "src/tests"
-  NODE_VERSION: 20
-  PYTHON_VERSION: '3.10'
   SERVERLESS_VERSION: '3.38.0'
+  TEST_FILES: '["api_mapping_manager", "record_manager", "scraper", "utils"]'
   APP: "fruit-project-api-scraper"
 
 jobs:
@@ -24,13 +22,13 @@ jobs:
       # id-token: write
     strategy:  
       matrix:  
-        test_file: ${{ fromJson('["api_mapping_manager", "record_manager", "scraper", "utils"]') }}
+        test_file: ${{ env.TEST_FILES }}
     uses: ./.github/workflows/pytest-matrix-tests-workflow.yml
     with:
       environment: feature
       test_file: ${{ matrix.test_file }}
     
-    
+
 
   # label-check:
   #   name: "Check Deploy Label"
