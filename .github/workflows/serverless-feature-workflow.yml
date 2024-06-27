@@ -24,6 +24,7 @@ jobs:
     uses: ./.github/workflows/pytest-matrix-tests-workflow.yml
     with:
       environment: feature
+      test_files: "['api_mapping_manager', 'record_manager', 'scraper', 'utils']"
 
   # label-check:
   #   name: "Check Deploy Label"

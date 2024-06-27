@@ -4,9 +4,9 @@ on:
       environment:
         type: string
         required: true
-      # test_file:
-      #   type: string
-      #   required: true
+      test_file:
+        type: string
+        required: true
 
 jobs:
   pytest:
@@ -14,12 +14,12 @@ jobs:
     runs-on: ubunti-latest
     strategy:  
       matrix:  
-        test_file: ["api_mapping_manager", "record_manager", "scraper", "utils"]
+        test_file: ${{ fromJson(inputs.test_file) }}
     steps:
     - uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event.workflow_call.head_sha }}
-        repository: ${{ github.repository }}
+      # with:
+      #   ref: ${{ github.event.workflow_call.head_sha }}
+      #   repository: ${{ github.repository }}
     - name: Set up Python version - ${{ vars.PYTHON_VERSION }}
       uses: actions/setup-python@v5
       with:
