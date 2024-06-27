@@ -46,7 +46,7 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         allow_failure: true
     - run: |
-        echo label_check
+        echo "label_check"
         echo ${{ steps.deploy_label_check.outputs.label_check }}
         if [[ ${{ steps.deploy_label_check.outputs.label_check }} == "success" ]]; then
           echo "can_deploy=true" >> "$GITHUB_OUTPUT"
@@ -61,7 +61,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.can_deploy }} == true
+    if: ${{ needs.label-check.outputs.can_deploy }} == "true"
     steps:
     - uses: actions/checkout@v4
     - name: Set AWS context
