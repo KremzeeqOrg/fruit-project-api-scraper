@@ -67,6 +67,7 @@ jobs:
     if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
       with:
