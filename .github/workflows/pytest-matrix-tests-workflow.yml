@@ -11,7 +11,7 @@ on:
 jobs:
   pytest:
     name: Pytest Test
-    runs-on: ubunti-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
