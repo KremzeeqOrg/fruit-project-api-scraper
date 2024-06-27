@@ -64,7 +64,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    if: ${{ needs.label-check.outputs.can_deploy }}
+    if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -72,6 +72,7 @@ jobs:
         run: |
           echo "label-check"
           echo ${{ needs.label-check.outputs.can_deploy }}
+          echo 'false'
     # - name: Set AWS context
     #   uses: aws-actions/configure-aws-credentials@v4
     #   with:
