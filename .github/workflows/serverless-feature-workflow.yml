@@ -14,22 +14,21 @@ env:
   APP: "fruit-project-api-scraper"
 
 jobs:
-  # pytest:
-  #   name: Pytest
-  #   permissions:
-  #     contents: read
-  #     # id-token: write
-  #   strategy:  
-  #     matrix:  
-  #       test_file: ${{ fromJson('["api_mapping_manager", "record_manager", "scraper", "utils"]') }}
-  #   uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-unit-test-workflow.yml@feature/add-pytest-unit-test-workflow.yml
-  #   with:
-  #     environment: feature
-  #     test_file: ${{ matrix.test_file }}
+  pytest:
+    name: Pytest
+    permissions:
+      contents: read
+    strategy:  
+      matrix:  
+        test_file: ${{ fromJson('["api_mapping_manager", "record_manager", "scraper", "utils"]') }}
+    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-unit-test-workflow.yml@main
+    with:
+      environment: ${{ env.ENV }}
+      test_file: ${{ matrix.test_file }}
     
   label-check:
     name: "Check Deploy Label"
-    # needs: [pytest]
+    needs: [pytest]
     runs-on: ubuntu-latest
     outputs:
       can_deploy: ${{ steps.set_output.outputs.can_deploy }}
@@ -67,45 +66,39 @@ jobs:
     if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: "label-check"
-        run: |
-          echo "label-check"
-          echo ${{ needs.label-check.outputs.can_deploy }}
-          echo 'false'
-    # - name: Set AWS context
-    #   uses: aws-actions/configure-aws-credentials@v4
-    #   with:
-    #     role-to-assume: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ACCESS_ROLE }}
-    #     role-session-name: GitHub_to_AWS_via_FederatedOIDC
-    #     aws-region: ${{ secrets.AWS_REGION }}
-    #     mask-aws-account-id: true
-    # - name: Login to Amazon ECR
-    #   uses: aws-actions/amazon-ecr-login@v2
-    #   with:
-    #     mask-password: 'true'
-    # - name: "Docker Build and push to AWS ECR"
-    #   id: docker-push
-    #   env:
-    #     AWS_ECR: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}
-    #   run: |
-    #     sha_short=$(git rev-parse --short HEAD)
-    #     image_sha_tag=feature-${sha_short}
-    #     echo "image_sha_tag=${image_sha_tag}" >> $GITHUB_OUTPUT
-    #     docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}:${image_sha_tag} .
-    #     docker push ${{ env.AWS_ECR }} --all-tags
-    # - name: Use Node.js ${{ env.NODE_VERSION }}
-    #   uses: actions/setup-node@v4
-    #   with:
-    #     node-version: ${{ env.NODE_VERSION }}
-    # - name: serverless deploy
-    #   run: | 
-    #     npm i -g serverless@${{ env.SERVERLESS_VERSION }}
-    #     npm install && npm list -g
-    #     tag_arg="tag=${{ steps.docker-push.outputs.image_sha_tag }}"
-    #     serverless deploy --stage ${{ env.ENV }} --param=${tag_arg}
-    #   env:
-    #     SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+    - name: Set AWS context
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ACCESS_ROLE }}
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ secrets.AWS_REGION }}
+        mask-aws-account-id: true
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
+        mask-password: 'true'
+    - name: "Docker Build and push to AWS ECR"
+      id: docker-push
+      env:
+        AWS_ECR: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}
+      run: |
+        sha_short=$(git rev-parse --short HEAD)
+        image_sha_tag=feature-${sha_short}
+        echo "image_sha_tag=${image_sha_tag}" >> $GITHUB_OUTPUT
+        docker build --platform linux/amd64 -t ${{ env.AWS_ECR }}:${image_sha_tag} .
+        docker push ${{ env.AWS_ECR }} --all-tags
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - name: serverless deploy
+      run: | 
+        npm i -g serverless@${{ env.SERVERLESS_VERSION }}
+        npm install && npm list -g
+        tag_arg="tag=${{ steps.docker-push.outputs.image_sha_tag }}"
+        serverless deploy --stage ${{ env.ENV }} --param=${tag_arg}
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
 
 
