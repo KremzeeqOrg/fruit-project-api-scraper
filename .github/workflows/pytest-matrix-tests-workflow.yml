@@ -4,9 +4,9 @@ on:
       environment:
         type: string
         required: true
-      # test_file:
-      #   type: string
-      #   required: true
+      test_file:
+        type: string
+        required: true
 
 jobs:
   pytest:
@@ -25,6 +25,8 @@ jobs:
         echo "Python test dir"
         echo ${{ vars.PYTEST_TEST_DIR }}
         echo 'checked out'
+        echo "test_file"
+        echo ${{ inputs.test_file }}
         ls -la
     # - name: Set up Python version - ${{ vars.PYTHON_VERSION }}
     #   uses: actions/setup-python@v5
