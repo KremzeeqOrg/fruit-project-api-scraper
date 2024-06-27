@@ -22,7 +22,7 @@ jobs:
       # id-token: write
     strategy:  
       matrix:  
-        test_file: ${{ env.TEST_FILES }}
+        test_file: ${{ fromJson(${{ env.TEST_FILES }}) }}
     uses: ./.github/workflows/pytest-matrix-tests-workflow.yml
     with:
       environment: feature
