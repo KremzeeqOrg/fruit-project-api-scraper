@@ -67,4 +67,5 @@ jobs:
         serverless deploy --stage ${{ vars.ENV }} --param=${image_uri}
       env:
         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+        
 
