@@ -61,7 +61,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.can_deploy }} == true
+    if: ${{ needs.label-check.outputs.can_deploy }} == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: "label-check"
