@@ -1,0 +1,75 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      deploy:
+        type: string
+        required: true
+
+jobs:
+  serverless-deploy:
+    name: "Serverless Feature Deploy to Dev"
+    needs: [label-check]
+    permissions:
+      id-token: write
+      contents: read
+    environment: feature
+    if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set AWS context
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ACCOUNT_ACCESS_ROLE }}
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ secrets.AWS_REGION }}
+        mask-aws-account-id: true
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
+        mask-password: 'true'
+    - name: "Docker push to AWS ECR"
+      id: docker-push
+      env:
+        AWS_ECR: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.APP }}
+      run: |
+        tag=""
+        aws_tag="${{ env.AWS_ECR }}:latest"
+        docker_hub_tag="${{ secrets.DOCKERHUB_USERNAME }}/${{ env.APP }}:latest"
+
+        if [ "${{ env.ENV }}" == 'feature' ] || [ "${{ env.ENV }}" == 'dev' ]; then
+          sha_short=$(git rev-parse --short HEAD)
+          tag="${{ env.ENV }}-${sha_short}"
+          aws_tag="${{ env.AWS_ECR }}:${tag}"
+          docker build --platform linux/amd64 -t "$aws_tag" .
+          docker push "$aws_tag"
+          if [ "${{ env.ENV }}" == 'dev' ]; then
+            docker tag "$aws_tag" "$docker_hub_tag"
+            docker push "$docker_hub_tag"
+          fi
+        elif [ "${{ env.ENV }}" == 'prod' ]; then
+          docker pull "$docker_hub_tag"
+          if [ $? -ne 0 ]; then
+            echo "Docker pull failed. Image not found: ${docker_hub_tag}"
+            exit 1
+          fi
+          docker tag "$docker_hub_tag" "$aws_tag"
+          docker push "$aws_tag"
+        fi
+        echo "imageURI=${aws_tag}" >> "$GITHUB_OUTPUT"
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - name: serverless deploy
+      run: | 
+        npm i -g serverless@${{ env.SERVERLESS_VERSION }}
+        npm install && npm list -g
+        image_uri="imageURI=${{ steps.docker-push.outputs.imageURI }}"
+        serverless deploy --stage ${{ env.ENV }} --param=${image_uri}
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+
