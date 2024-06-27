@@ -45,17 +45,11 @@ jobs:
           allow_failure: true
       - id: set_output
         run: |
-          echo "label_check"
-          echo ${{ steps.deploy_label_check.outputs.label_check }}
           if [[ "${{ steps.deploy_label_check.outputs.label_check }}" == "success" ]]; then
             echo "can_deploy=true" >> "$GITHUB_OUTPUT"
           else
             echo "can_deploy=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: Output debug
-        run: |
-          echo "Set output debug"
-          echo "${{ steps.set_output.outputs.can_deploy }}"
 
   serverless-feature-deploy:
     name: "Serverless Feature Deploy to Dev"
