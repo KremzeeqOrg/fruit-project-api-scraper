@@ -16,12 +16,11 @@ class RecordManager:
     self.field_mapping = ssm_value_dict["field_mapping"]
     #https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html
     self.dynamo_db_batch_size = 25
+    self.timestamp = validate_timestamp(str(datetime.now(pytz.timezone('Europe/London'))))
 
   def execute(self):
     print("Starting executing RecordManager")
-
     self.api_records = self.transform_data_for_upload(self.api_records)
-    self.timestamp = validate_timestamp(str(datetime.now(pytz.timezone('Europe/London'))))
     record_batches = self.get_record_batches(self.api_records, self.dynamo_db_batch_size)
     self.upload_batches_to_dynamo_db(record_batches)
     print("Finished executing RecordManager")
@@ -56,12 +55,14 @@ class RecordManager:
   
   def rename_fields(self, api_records, field_mapping):
     """
-    -> dict : api_records, where keys are removed as per field_mapping, 
-    which has old keys mapped to new keys. 
+    Keys are renamed as per field_mapping, which has old keys mapped to new keys. 
+    A timestamp is also added for records
+    -> dict : api_records
     """
     for record in api_records:
        for k, v in field_mapping.items():
          record[v] = record.pop(k)
+         record['timestamp'] = self.timestamp
     return api_records
     
   def prepare_ingredients_doc(self, api_records, ssm_value_dict):
