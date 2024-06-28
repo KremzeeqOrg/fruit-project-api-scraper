@@ -53,24 +53,24 @@ jobs:
         aws_tag="${{ env.AWS_ECR }}:latest"
         docker_hub_tag="${{ secrets.dockerhub-username }}/${{ vars.APP }}:latest"
 
-        if [ "${{ vars.ENV }}" == 'feature' ] || [ "${{ vars.ENV }}" == 'dev' ]; then
+        if [ ${{ vars.ENV }} == 'feature' ] || [ ${{ vars.ENV }} == 'dev' ]; then
           sha_short=$(git rev-parse --short HEAD)
           tag="${{ vars.ENV }}-${sha_short}"
           aws_tag="${{ env.AWS_ECR }}:${tag}"
-          docker build --platform linux/amd64 -t "$aws_tag" .
-          docker push "$aws_tag"
-          if [ "${{ vars.ENV }}" == 'dev' ]; then
-            docker tag "$aws_tag" "$docker_hub_tag"
-            docker push "$docker_hub_tag"
+          docker build --platform linux/amd64 -t $aws_tag .
+          docker push $aws_tag
+          if [ ${{ vars.ENV }} == 'dev' ]; then
+            docker tag $aws_tag $docker_hub_tag
+            docker push $docker_hub_tag
           fi
-        elif [ "${{ vars.ENV }}" == 'prod' ]; then
-          docker pull "$docker_hub_tag"
+        elif [ ${{ vars.ENV }} == 'prod' ]; then
+          docker pull $docker_hub_tag
           if [ $? -ne 0 ]; then
             echo "Docker pull failed. Image not found: ${docker_hub_tag}"
             exit 1
           fi
-          docker tag "$docker_hub_tag" "$aws_tag"
-          docker push "$aws_tag"
+          docker tag $docker_hub_tag $aws_tag
+          docker push $aws_tag
         fi
         echo "imageURI=${aws_tag}" >> "$GITHUB_OUTPUT"
     - name: Use Node.js ${{ vars.NODE_VERSION }}
