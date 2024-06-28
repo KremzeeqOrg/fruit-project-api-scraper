@@ -52,10 +52,10 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
+    # if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
     uses: ./.github/workflows/serverless-deploy-workflow.yml
     with:
-      environment: feature
+      environment: dev
     secrets: 
       aws-region: ${{ secrets.AWS_REGION }}
       aws-iam-role: ${{ secrets.AWS_ACCOUNT_ACCESS_ROLE }}
