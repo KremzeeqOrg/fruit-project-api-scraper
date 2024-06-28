@@ -33,7 +33,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml
+    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml@main
     with:
       environment: dev
     secrets: 
@@ -50,7 +50,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml
+    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml@main
     with:
       environment: prod
     secrets: 
