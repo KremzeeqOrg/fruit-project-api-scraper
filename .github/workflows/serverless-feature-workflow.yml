@@ -56,5 +56,12 @@ jobs:
     uses: ./.github/workflows/serverless-deploy-workflow.yml
     with:
       environment: feature
+    secrets: 
+      aws-region: ${{ secrets.AWS_REGION }}
+      aws-iam-role: ${{ secrets.AWS_ACCOUNT_ACCESS_ROLE }}
+      aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
+      dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+      serverless-access-key: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
 
