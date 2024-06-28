@@ -16,12 +16,11 @@ class RecordManager:
     self.field_mapping = ssm_value_dict["field_mapping"]
     #https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html
     self.dynamo_db_batch_size = 25
+    self.timestamp = validate_timestamp(str(datetime.now(pytz.timezone('Europe/London'))))
 
   def execute(self):
     print("Starting executing RecordManager")
-
     self.api_records = self.transform_data_for_upload(self.api_records)
-    self.timestamp = validate_timestamp(str(datetime.now(pytz.timezone('Europe/London'))))
     record_batches = self.get_record_batches(self.api_records, self.dynamo_db_batch_size)
     self.upload_batches_to_dynamo_db(record_batches)
     print("Finished executing RecordManager")
