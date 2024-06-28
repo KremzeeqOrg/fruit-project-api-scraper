@@ -62,6 +62,7 @@ class RecordManager:
     for record in api_records:
        for k, v in field_mapping.items():
          record[v] = record.pop(k)
+         record['timestamp'] = self.timestamp
     return api_records
     
   def prepare_ingredients_doc(self, api_records, ssm_value_dict):
