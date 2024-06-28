@@ -30,6 +30,17 @@ def target_api_1_field_mapping():
     return deepcopy(sample_ssm_value_dicts[TARGET_API_1]["field_mapping"])
 
 @pytest.fixture
+def target_api_1_expected_fields_post_rename_fields():
+   return ['family1', 'genus1', 'id1', 'name', 'order1','timestamp']
+
+@pytest.fixture
+def target_api_2_expected_fields_post_rename_fields():
+   return ['alcoholic', 'creative_commons_confirmed', 'glass', 'id', 'image_attribution', 'image_source','ingredient_1','ingredient_10','ingredient_11',
+        'ingredient_12','ingredient_13','ingredient_14','ingredient_15','ingredient_2','ingredient_3','ingredient_4','ingredient_5','ingredient_6',
+        'ingredient_7','ingredient_8','ingredient_9','instructions','measure_1','measure_10','measure_11','measure_12','measure_13','measure_14',
+        'measure_15','measure_2','measure_3','measure_4','measure_5','measure_6','measure_7','measure_8','measure_9','name','thumbnail_link','timestamp']
+
+@pytest.fixture
 def target_api_1_ssm_value_dict():
     return deepcopy(sample_ssm_value_dicts[TARGET_API_1])
 
@@ -68,8 +79,8 @@ def target_api_2_ssm_value_dict():
     return deepcopy(sample_ssm_value_dicts[TARGET_API_2])
 
 @pytest.fixture
-def target_api_fields_post_transformation():
-   return ["id", "name", "alcoholic", "glass", "instructions", "thumbnail_link", "image_source", "image_attribution", "creative_commons_confirmed", "ingredients"]
+def target_api_2_fields_post_transformation():
+   return ["id", "name", "alcoholic", "glass", "instructions", "thumbnail_link", "image_source", "image_attribution", "creative_commons_confirmed", "ingredients", "timestamp"]
 
 
 class TestRecordManager:
@@ -81,15 +92,15 @@ class TestRecordManager:
       api_records = target_api_2_record_manager.remove_fields_not_needed(target_api_2_api_records, target_api_2_field_mapping)
       assert sorted(api_records[0].keys()) == sorted(target_api_2_field_mapping.keys())
 
-    def test_rename_fields_for_target_api_1(self, target_api_1_record_manager, target_api_1_records, target_api_1_field_mapping):
+    def test_rename_fields_for_target_api_1(self, target_api_1_record_manager, target_api_1_records, target_api_1_field_mapping, target_api_1_expected_fields_post_rename_fields):
       api_records = target_api_1_record_manager.remove_fields_not_needed(target_api_1_records, target_api_1_field_mapping)
       api_records = target_api_1_record_manager.rename_fields(api_records, target_api_1_field_mapping)
-      assert sorted(api_records[0].keys()) == sorted(target_api_1_field_mapping.values())
+      assert sorted(api_records[0].keys()) == sorted(target_api_1_expected_fields_post_rename_fields)
 
-    def test_rename_fields_for_target_api_2(self, target_api_2_record_manager, target_api_2_api_records, target_api_2_field_mapping):
+    def test_rename_fields_for_target_api_2(self, target_api_2_record_manager, target_api_2_api_records, target_api_2_field_mapping, target_api_2_expected_fields_post_rename_fields):
       api_records = target_api_2_record_manager.remove_fields_not_needed(target_api_2_api_records, target_api_2_field_mapping)
       api_records = target_api_2_record_manager.rename_fields(target_api_2_api_records, target_api_2_field_mapping)
-      assert sorted(api_records[0].keys()) == sorted(target_api_2_field_mapping.values())
+      assert sorted(api_records[0].keys()) == target_api_2_expected_fields_post_rename_fields
 
     def test_prepare_ingredients_doc_for_target_api_2(self, target_api_2_record_manager, target_api_2_api_records, target_api_2_field_mapping, target_api_2_ssm_value_dict):
        api_records = target_api_2_record_manager.remove_fields_not_needed(target_api_2_api_records, target_api_2_field_mapping, )
@@ -104,17 +115,16 @@ class TestRecordManager:
             api_records = target_api_2_record_manager.prepare_ingredients_doc(api_records, target_api_2_ssm_value_dict)
             assert api_records[0]["ingredients"][0]["ingredient"] != "White Rum" and api_records[0]["ingredients"][0]["measure_1"] == "2 oz"
 
-    def test_target_api_1_records_have_expected_keys_after_data_transformation(self, target_api_1_record_manager, target_api_1_records, target_api_1_field_mapping):
+    def test_target_api_1_records_have_expected_keys_after_data_transformation(self, target_api_1_record_manager, target_api_1_records, target_api_1_expected_fields_post_rename_fields):
         api_records =  target_api_1_record_manager.transform_data_for_upload(target_api_1_records)
         found_keys = sorted(list(api_records[0].keys()))
-        expected_keys = sorted(list(target_api_1_field_mapping.values()))
-        assert expected_keys == found_keys
+
+        assert found_keys == sorted(target_api_1_expected_fields_post_rename_fields)
     
-    def test_target_api_2_api_records_have_expected_keys_after_data_transformation(self, target_api_2_record_manager, target_api_2_api_records, target_api_fields_post_transformation):
+    def test_target_api_2_api_records_have_expected_keys_after_data_transformation(self, target_api_2_record_manager, target_api_2_api_records, target_api_2_fields_post_transformation):
         api_records =  target_api_2_record_manager.transform_data_for_upload(target_api_2_api_records)
         found_keys = sorted(list(api_records[0].keys()))
-        expected_keys = sorted(target_api_fields_post_transformation)
-        assert expected_keys == found_keys
+        assert found_keys == sorted(target_api_2_fields_post_transformation)
 
     def test_get_record_batches_yields_generator(self, target_api_1_record_manager, target_api_1_records):
         api_records = target_api_1_record_manager.transform_data_for_upload(target_api_1_records)

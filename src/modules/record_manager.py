@@ -55,8 +55,9 @@ class RecordManager:
   
   def rename_fields(self, api_records, field_mapping):
     """
-    -> dict : api_records, where keys are removed as per field_mapping, 
-    which has old keys mapped to new keys. 
+    Keys are renamed as per field_mapping, which has old keys mapped to new keys. 
+    A timestamp is also added for records
+    -> dict : api_records
     """
     for record in api_records:
        for k, v in field_mapping.items():
