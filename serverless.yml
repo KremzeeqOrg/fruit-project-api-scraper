@@ -23,7 +23,7 @@ provider:
   ecr:
     images:
       appImage:
-        uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/${self:service}:${param:tag}
+        uri: ${param:imageURI}
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
