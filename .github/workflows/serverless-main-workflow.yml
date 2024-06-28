@@ -46,7 +46,7 @@ jobs:
 
   serverless-deploy-to-prod:
     name: "Serverless Deploy to Prod"
-    needs: [ erverless-deploy-to-dev ]
+    needs: [ serverless-deploy-to-dev ]
     permissions:
       id-token: write
       contents: read

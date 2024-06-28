@@ -23,7 +23,7 @@ jobs:
 
   label-check:
     name: "Check Deploy Label"
-    # needs: [pytest]
+    needs: [pytest]
     runs-on: ubuntu-latest
     outputs:
       can_deploy: ${{ steps.set_output.outputs.can_deploy }}
