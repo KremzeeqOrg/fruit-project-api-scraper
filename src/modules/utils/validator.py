@@ -53,14 +53,15 @@ def validate_timestamp(timestamp):
     raise Exception(f"Error: {e} - timestamp is not valid").with_traceback(e.__traceback__)
   
 def validate_api_records_exist(api_records):
+  message="No api_records have been found"
   try:
     x = len(api_records)
     if x > 0:
       return api_records
     else:
-      raise ValueError("There are no api_records")
+      raise ValueError(f"{message}")
   except TypeError as e:
-    raise Exception(f"api_records is {type(api_records)}. no api_records found. {e}.").with_traceback(e.__traceback__)
+    raise Exception(f"api_records is {type(api_records)}. {message}").with_traceback(e.__traceback__)
   
 def validate_api_record_keys(api_records, field_mapping):
 

@@ -33,18 +33,21 @@ class Orchestrator:
       print("Enacting alphabetical scraping rule")    
       base_endpoint = ssm_value_dict["source_api_endpoint"]
       # for i in alphabet:
-      try:
-          # print(f"Letter - {i}")
-          print(f"Letter - z")
-          ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + "z"
-          self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
-      except KeyError as e:
-          raise Exception(f"Key Error: {e}, There's an inconsistency with data supplied.").with_traceback(e.__traceback__)
-      except Exception as e:
-        print(e)
+      print(f"Letter - a")
+      ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + "a"
+      self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
 
   def scrape_and_upload_records_to_dynamo_db(self, scraper, ssm_value_dict):
-      api_records = scraper.get_api_records_from_endpoint(ssm_value_dict)
-      print(f'Scraping records for {ssm_value_dict["source_api"]}')
-      record_manager = RecordManager(api_records, ssm_value_dict)
-      record_manager.execute()
+      try:
+        print(f'Scraping records for {ssm_value_dict["source_api"]}')
+        api_records = scraper.get_api_records_from_endpoint(ssm_value_dict)
+        if ssm_value_dict["source_api_records_key"] != "":
+          api_records=api_records[ssm_value_dict["source_api_records_key"]]
+          record_manager = RecordManager(api_records, ssm_value_dict)
+          record_manager.execute()
+      except ValueError as e:
+        message="No api_records have been found"
+        if e.message == message:
+          print(message)
+      except Exception as e:
+         raise e

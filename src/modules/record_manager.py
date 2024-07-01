@@ -9,7 +9,7 @@ class RecordManager:
   Adds fields scraped api record documents and sends them to a specific DynamoDB table 
   """
   def __init__(self, api_records, ssm_value_dict):
-    self.api_records = validate_api_records_exist(api_records)
+    self.api_records = api_records
     self.ssm_value_dict = ssm_value_dict
     self.dynamo_db_table = ssm_value_dict["dynamo_db_config"]["table"]
     self.dynamo_db_table_hash_key = ssm_value_dict["dynamo_db_config"]["hash_key"]
@@ -20,7 +20,6 @@ class RecordManager:
     
 
   def execute(self):
-
     
     print("Starting executing RecordManager")
     
@@ -48,7 +47,6 @@ class RecordManager:
     records are uploaded to Dynamo DB 
     """
     keys_to_keep = sorted(list((field_mapping.keys())))
-
     api_record_keys = sorted(list((api_records[0].keys()))) 
     keys_to_remove =  list(filter(lambda x: x not in keys_to_keep, api_record_keys))
     for record in api_records:
@@ -152,7 +150,7 @@ class RecordManager:
                                                       )
         return response
       except botocore.exceptions.ClientError as e:
-         raise e
+         raise e.with_traceback(e.__traceback__)
 
   def upload_batches_to_dynamo_db(self, record_batches):
     """
