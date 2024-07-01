@@ -69,15 +69,10 @@ class Scraper:
     try:
       r = requests.get(endpoint, headers=headers)
       if r.status_code == 200:
-        print("got 200")
         api_records = r.json()
-        print("here are the api records")
-        print(api_records)      
         if isinstance(api_records, list):
           return api_records
         else:
-          print("status_code")
-          print(r.status_code)
           try: 
             api_records = api_records[ssm_value_dict["source_api_records_key"]]
             return api_records
