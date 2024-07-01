@@ -69,7 +69,7 @@ class Scraper:
     try:
       r = requests.get(endpoint, headers=headers)
       if r.status_code == 200:
-        api_records = r.json()        
+        api_records = r.json()
         if isinstance(api_records, list):
           return api_records
         else:
@@ -80,6 +80,7 @@ class Scraper:
             derived_type = type(api_records)
             raise Exception(f"'api_records' is not a list object. It is {derived_type}- Error - {e}")    
       else:
+        print("exception raised here")
         raise Exception(f'Error- status code: {r.status_code} - error message: {r.text}')
     except requests.exceptions.RequestException as e:
       raise Exception(f'Error: {e}')

@@ -30,6 +30,23 @@ fruity_vice_api_records = [
         },
     }]
 
+fruity_vice_api_records_with_dropped_fields_not_needed = [
+    {
+        "name": "Persimmon",
+        "id": 52,
+        "family": "Ebenaceae",
+        "order": "Rosales",
+        "genus": "Diospyros",
+    },
+    {
+        "name": "Strawberry",
+        "id": 3,
+        "family": "Rosaceae",
+        "order": "Rosales",
+        "genus": "Fragaria",
+
+    }]
+
 cocktail_db_api_records = '''
 [
     {
@@ -142,4 +159,5 @@ cocktail_db_api_records = '''
 '''
 
 sample_api_response_dicts = { "fruity-vice" : fruity_vice_api_records,
+                             "fruity-vice-with-dropped-fields-not-needed" : fruity_vice_api_records_with_dropped_fields_not_needed,
                               "the-cocktail-db" : json.loads(cocktail_db_api_records)}
