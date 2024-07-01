@@ -153,7 +153,6 @@ Note: Tests are run, with imports from [helper files](./src/helper_files/). This
 <details>
 
 <summary>Understanding fields in SSM parameter</summary>
-Understanding fields in parameter:
 
 | Field              | Explanation                                                                                                                                  |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
