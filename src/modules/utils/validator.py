@@ -60,11 +60,12 @@ def validate_api_records_exist(api_records, ssm_value_dict):
     length= len(api_records)
     if length > 0:
       return api_records
-  elif api_records == None or length==0:
+    else:
+      raise ValueError(f"{message}")
+  elif api_records == None:
     raise ValueError(f"{message}")
 
 def validate_api_record_keys(api_records, field_mapping):
-
   api_record_keys=set(list(api_records[0].keys()))
   field_mapping_keys=set(list(field_mapping.keys()))
   try: 
