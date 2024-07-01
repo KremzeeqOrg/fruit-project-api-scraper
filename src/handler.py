@@ -12,4 +12,4 @@ def main(event, context):
     orchestrator.execute()
 
 if __name__ == '__main__':
-  main('', '')
+  main(event, '')

@@ -4,10 +4,9 @@ import pytest
 from copy import deepcopy
 from moto import mock_aws
 from modules.record_manager import RecordManager
-
-
 from test_sample_records.sample_ssm_records import sample_ssm_value_dicts
 from test_sample_records.sample_api_records import sample_api_response_dicts
+
 
 REGION = "eu-west-2"
 
@@ -68,7 +67,7 @@ def target_api_2_record_manager():
 
 @pytest.fixture
 def target_api_2_api_records():
-    return deepcopy(sample_api_response_dicts[TARGET_API_2])
+    return deepcopy(sample_api_response_dicts[TARGET_API_2]['drinks'])
 
 @pytest.fixture
 def target_api_2_field_mapping():

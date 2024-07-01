@@ -124,6 +124,7 @@ Alternatively, you can execute AWS Step Functions state machine (e.g. `fruit-pro
 - With your virtual environment activated, run: `pytest -vv ./src/tests/`
 
 Note: Tests are run, with imports from [helper files](./src/helper_files/). This contains samples for AWS Parameter Store parameters and also for fetched sample_api records from target APIs.
+To avoid `pycache` files being created, ensure you have set `export PYTHONDONTWRITEBYTECODE=1` in your terminal. Otherwise, this will impact results from tests which use mocked AWS clients.
 
 ## Appendix
 

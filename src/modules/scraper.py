@@ -6,6 +6,7 @@ import botocore.errorfactory
 
 from modules.utils.validator import SSMValueDictValidator
 
+
 class Scraper:
   """
   Retrieves ssm parameter data for target api - source-api-name and scrapes target api
@@ -70,17 +71,9 @@ class Scraper:
       r = requests.get(endpoint, headers=headers)
       if r.status_code == 200:
         api_records = r.json()
-        if isinstance(api_records, list):
-          return api_records
-        else:
-          try: 
-            api_records = api_records[ssm_value_dict["source_api_records_key"]]
-            return api_records
-          except Exception as e:
-            derived_type = type(api_records)
-            raise Exception(f"'api_records' is not a list object. It is {derived_type}- Error - {e}")    
+        return api_records
+        # return validate_api_records_exist(api_records,ssm_value_dict)
       else:
-        print("exception raised here")
-        raise Exception(f'Error- status code: {r.status_code} - error message: {r.text}')
+        raise Exception(f'Error- status code: {r.status_code} - error message: {r.text}. Was unable to scrape api_records from endpoint - {endpoint}')
     except requests.exceptions.RequestException as e:
       raise Exception(f'Error: {e}')

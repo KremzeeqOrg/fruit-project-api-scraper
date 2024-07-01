@@ -3,6 +3,7 @@ from config.api_mapping import APIMapping
 from string import ascii_lowercase as alphabet
 from modules.record_manager import RecordManager
 from modules.utils.api_mapping_manager import APIMappingManager
+from modules.utils.validator import validate_api_records_exist
 
 class Orchestrator:
   def __init__(self, app, source_api_name):
@@ -25,20 +26,28 @@ class Orchestrator:
     print("Finished executing Orchestrator")
 
   def scrape_and_upload_records_for_alphabetical_scraping_rule(self, scraper, ssm_value_dict, api_mapping_manager):
+      """
+      If no api_records are found for a letter in the alphabet, the behaviour is to continue to scrape records for other letters.
+      This means, care should be taken with handling exceptions 
+      """
       print("Enacting alphabetical scraping rule")    
       base_endpoint = ssm_value_dict["source_api_endpoint"]
       for i in alphabet:
-        try:
-            print(f"Letter - {i}")
-            ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + i
-            self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
-        except KeyError as e:
-            raise f"Key Error: {e}, There's an inconsistency with data supplied."
-        except Exception as e:
-          print(e)
+        print(f'Scraping records for {ssm_value_dict["source_api"]}')
+        print(f"Letter - {i}")
+        ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + i
+        self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
 
   def scrape_and_upload_records_to_dynamo_db(self, scraper, ssm_value_dict):
-      api_records = scraper.get_api_records_from_endpoint(ssm_value_dict)
-      print(f'Scraping records for {ssm_value_dict["source_api"]}')
-      record_manager = RecordManager(api_records, ssm_value_dict)
-      record_manager.execute()
+      try:
+        print(f'Scraping records for {ssm_value_dict["source_api"]}')
+        api_records = scraper.get_api_records_from_endpoint(ssm_value_dict)
+        api_records = validate_api_records_exist(api_records, ssm_value_dict)
+        record_manager = RecordManager(api_records, ssm_value_dict)
+        record_manager.execute()
+      except ValueError as e:
+        message="No api_records have been found"
+        if str(e) == message:
+          print(message)
+      except Exception as e:
+         raise e
