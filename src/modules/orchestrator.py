@@ -29,12 +29,13 @@ class Orchestrator:
       base_endpoint = ssm_value_dict["source_api_endpoint"]
       for i in alphabet:
         try:
-          print(f"Letter - {i}")
-          ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + i
-          self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
+            print(f"Letter - {i}")
+            ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + i
+            self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
+        except KeyError as e:
+            raise f"Key Error: {e}, There's an inconsistency with data supplied."
         except Exception as e:
           print(e)
-
 
   def scrape_and_upload_records_to_dynamo_db(self, scraper, ssm_value_dict):
       api_records = scraper.get_api_records_from_endpoint(ssm_value_dict)

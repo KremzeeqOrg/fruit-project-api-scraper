@@ -14,7 +14,7 @@ class SSMValueDictValidator:
     self.validate_ssm_value_dict_types(self.ssm_value_dict)
 
   def validate_source_api_name_in_ssm_value_dict(self, source_api_name, ssm_value_dict):
-    print("ssm_value_dict['source_api'] ")
+    print("source_api")
     print(ssm_value_dict["source_api"] )
     if ssm_value_dict["source_api"] != source_api_name:
       raise ValueError(f"Check that ssm parameter relates to {source_api_name}. source_api in ssm_value_dict is {ssm_value_dict['source_api']}")
@@ -54,7 +54,7 @@ def validate_timestamp(timestamp):
   except ValueError as e:
     raise Exception(f"Error: {e} - timestamp is not valid")
   
-def validate_api_records(api_records):
+def validate_api_records_exist(api_records):
   try:
     x = len(api_records)
     if x > 0:
@@ -63,8 +63,18 @@ def validate_api_records(api_records):
       raise ValueError("There are no api_records")
   except Exception as e:
     raise f"api_records is {type(api_records)}- {e}, no api_records found"
+  
+def validate_api_record_keys(api_records, field_mapping):
 
-
+  api_record_keys=set(list(api_records[0].keys()))
+  field_mapping_keys=set(list(field_mapping.keys()))
+  try: 
+    if api_record_keys == field_mapping_keys:
+      return api_records
+  except KeyError as e:
+      extra_keys_in_field_mapping = field_mapping_keys - api_record_keys
+      extra_keys_in_api_mapping = api_record_keys - field_mapping_keys
+      raise e(f"Key Error: {e}. \n Here's extra_keys_in_field_mapping: {extra_keys_in_field_mapping}. \n Here's extra_keys_in_api_mapping: {extra_keys_in_api_mapping} \n api_record_keys : {api_record_keys} \n field_mapping_keys : {field_mapping_keys}")
 
   
 

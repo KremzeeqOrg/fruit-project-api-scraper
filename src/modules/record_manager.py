@@ -2,14 +2,14 @@ import boto3
 import pytz
 import botocore
 from datetime import datetime
-from modules.utils.validator import validate_timestamp, validate_api_records
+from modules.utils.validator import validate_timestamp, validate_api_records_exist, validate_api_record_keys
 
 class RecordManager:
   """
   Adds fields scraped api record documents and sends them to a specific DynamoDB table 
   """
   def __init__(self, api_records, ssm_value_dict):
-    self.api_records = validate_api_records(api_records)
+    self.api_records = validate_api_records_exist(api_records)
     self.ssm_value_dict = ssm_value_dict
     self.dynamo_db_table = ssm_value_dict["dynamo_db_config"]["table"]
     self.dynamo_db_table_hash_key = ssm_value_dict["dynamo_db_config"]["hash_key"]
@@ -17,9 +17,13 @@ class RecordManager:
     #https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html
     self.dynamo_db_batch_size = 25
     self.timestamp = validate_timestamp(str(datetime.now(pytz.timezone('Europe/London'))))
+    
 
   def execute(self):
+
+    
     print("Starting executing RecordManager")
+    
     self.api_records = self.transform_data_for_upload(self.api_records)
     record_batches = self.get_record_batches(self.api_records, self.dynamo_db_batch_size)
     self.upload_batches_to_dynamo_db(record_batches)
@@ -31,6 +35,7 @@ class RecordManager:
     Assumption is made that all fields are the same for all scraped records
     """
     api_records = self.remove_fields_not_needed(api_records, self.field_mapping)
+    api_records = validate_api_record_keys(api_records, self.field_mapping)
     api_records = self.rename_fields(api_records, self.field_mapping)
 
     if "ingredient_max_count" in list(self.ssm_value_dict["custom_field_info"].keys()):
@@ -42,7 +47,6 @@ class RecordManager:
     -> dict : api_records, with fields removed which are not needed for when
     records are uploaded to Dynamo DB 
     """
-
     keys_to_keep = sorted(list((field_mapping.keys())))
 
     api_record_keys = sorted(list((api_records[0].keys()))) 
@@ -51,7 +55,6 @@ class RecordManager:
       for key in keys_to_remove:
           record.pop(key, None)
     return api_records
-
   
   def rename_fields(self, api_records, field_mapping):
     """
@@ -166,6 +169,5 @@ class RecordManager:
       self.upload_batch_to_dynamo_db(dynamo_db_resource, batch_items)
       batch_items = self.get_batch_items(record_batch, "put")
       self.upload_batch_to_dynamo_db(dynamo_db_resource, batch_items)
-      # print(response)
       counter += 1
       print({"Batch uploaded"})

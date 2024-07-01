@@ -5,9 +5,10 @@ from datetime import datetime
 
 from test_sample_records.sample_api_records import sample_api_response_dicts
 from test_sample_records.sample_ssm_records import sample_ssm_value_dicts
-from modules.utils.validator import SSMValueDictValidator, validate_timestamp, validate_api_records
+from modules.utils.validator import SSMValueDictValidator, validate_timestamp, validate_api_records_exist, validate_api_record_keys
 
 TARGET_API_1 = "fruity-vice"
+TARGET_API_1_WITH_DROPPED_FIELDS_NOT_NEEDED = "fruity-vice-with-dropped-fields-not-needed"
 DUMMY_API = "dummy"
 
 SSM_VALUE_DICT = sample_ssm_value_dicts[TARGET_API_1]
@@ -25,6 +26,13 @@ def target_api_1_ssm_value_dict():
 def target_api_1_records():
     return deepcopy(sample_api_response_dicts[TARGET_API_1])
 
+@pytest.fixture
+def target_api_1_records_with_dropped_fields_not_needed():
+    return deepcopy(sample_api_response_dicts[TARGET_API_1_WITH_DROPPED_FIELDS_NOT_NEEDED])
+
+@pytest.fixture
+def target_api_1_field_mapping():
+    return deepcopy(sample_ssm_value_dicts[TARGET_API_1]["field_mapping"])
 
 class TestUtils:
 
@@ -69,11 +77,33 @@ class TestUtils:
      except ValueError:
       pytest.fail(f'ValueError raised supplied for {timestamp}')
 
-  def test_validate_api_records(self, target_api_1_records):
-     api_records = validate_api_records(target_api_1_records)
+  def test_validate_api_records_exist(self, target_api_1_records):
+     api_records = validate_api_records_exist(target_api_1_records)
      assert api_records == target_api_1_records
 
-  def test_validate_api_records_raises_exception(self):
+  def test_validate_api_records_raises_exception_for_none_type(self):
      NoneType = type(None)
      with pytest.raises(Exception):
-        validate_api_records(NoneType)
+        validate_api_records_exist(NoneType)
+
+  def test_validate_api_records_raises_exception_for_empty_list(self):
+     with pytest.raises(Exception):
+        validate_api_records_exist([])
+
+  def test_validate_api_record_keys(self, target_api_1_records, target_api_1_field_mapping):
+     target_api_1_records[0].pop('nutritions')
+     
+     assert validate_api_record_keys(target_api_1_records, target_api_1_field_mapping) == target_api_1_records
+
+  def test_validate_api_record_keys_raises_exception_for_extra_key_in_field_mapping(self, target_api_1_records, target_api_1_field_mapping):
+     with pytest.raises(KeyError):
+        target_api_1_field_mapping["extra_field"] = 'x'
+        validate_api_record_keys(target_api_1_records[0], target_api_1_field_mapping)
+
+  def test_validate_api_record_keys_raises_exception_for_extra_key_in_api_records(self, target_api_1_records, target_api_1_records_with_dropped_fields_not_needed):
+     with pytest.raises(KeyError):
+        validate_api_record_keys(target_api_1_records[0], target_api_1_records_with_dropped_fields_not_needed)
+
+
+
+     
