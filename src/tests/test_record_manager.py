@@ -1,16 +1,12 @@
-import sys
 import boto3
 import types
 import pytest
 from copy import deepcopy
 from moto import mock_aws
 from modules.record_manager import RecordManager
-
-
 from test_sample_records.sample_ssm_records import sample_ssm_value_dicts
 from test_sample_records.sample_api_records import sample_api_response_dicts
 
-sys.dont_write_bytecode = True
 
 REGION = "eu-west-2"
 
