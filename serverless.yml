@@ -1,5 +1,5 @@
 service: fruit-project-api-scraper
-frameworkVersion: '3'
+frameworkVersion: '4'
 
 plugins:
   - serverless-prune-plugin
