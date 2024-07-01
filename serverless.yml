@@ -28,6 +28,29 @@ provider:
   memorySize: 512
   timeout: 10
 
+  iam:
+    role:
+      name: ${self:service}-lambda-role-${sls:stage}
+      statements:
+        - Effect: "Allow"
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
+          Resource:
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table1}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table2}
+            - Fn::Sub: ${param:dynamoDbArnPrefix}/${param:table3}
+        - Effect: "Allow"
+          Action:
+            - ssm:GetParameter
+          Resource: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${self:service}--*
+
 functions:
   app:
     name: ${param:functionName}
