@@ -52,17 +52,17 @@ def validate_timestamp(timestamp):
   except ValueError as e:
     raise Exception(f"Error: {e} - timestamp is not valid").with_traceback(e.__traceback__)
   
-def validate_api_records_exist(api_records):
+def validate_api_records_exist(api_records, ssm_value_dict):
   message="No api_records have been found"
-  try:
-    x = len(api_records)
-    if x > 0:
+  if isinstance(api_records, dict):
+    api_records=api_records[ssm_value_dict["source_api_records_key"]]
+  if isinstance(api_records, list):
+    length= len(api_records)
+    if length > 0:
       return api_records
-    else:
-      raise ValueError(f"{message}")
-  except TypeError as e:
-    raise Exception(f"api_records is {type(api_records)}. {message}").with_traceback(e.__traceback__)
-  
+  elif api_records == None or length==0:
+    raise ValueError(f"{message}")
+
 def validate_api_record_keys(api_records, field_mapping):
 
   api_record_keys=set(list(api_records[0].keys()))

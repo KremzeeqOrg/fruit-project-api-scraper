@@ -48,7 +48,7 @@ fruity_vice_api_records_with_dropped_fields_not_needed = [
     }]
 
 cocktail_db_api_records = '''
-[
+{ "drinks" : [
     {
         "idDrink": "178371",
         "strDrink": "Old Cuban",
@@ -155,7 +155,7 @@ cocktail_db_api_records = '''
         "strCreativeCommonsConfirmed": "No",
         "dateModified": null
     }
-]
+]}
 '''
 
 sample_api_response_dicts = { "fruity-vice" : fruity_vice_api_records,

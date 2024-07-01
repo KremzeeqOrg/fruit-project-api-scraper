@@ -3,7 +3,7 @@ from config.api_mapping import APIMapping
 from string import ascii_lowercase as alphabet
 from modules.record_manager import RecordManager
 from modules.utils.api_mapping_manager import APIMappingManager
-from traceback import print_exc
+from modules.utils.validator import validate_api_records_exist
 
 class Orchestrator:
   def __init__(self, app, source_api_name):
@@ -33,7 +33,8 @@ class Orchestrator:
       print("Enacting alphabetical scraping rule")    
       base_endpoint = ssm_value_dict["source_api_endpoint"]
       for i in alphabet:
-        print(f"Letter - i")
+        print(f'Scraping records for {ssm_value_dict["source_api"]}')
+        print(f"Letter - {i}")
         ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + i
         self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
 
@@ -41,13 +42,12 @@ class Orchestrator:
       try:
         print(f'Scraping records for {ssm_value_dict["source_api"]}')
         api_records = scraper.get_api_records_from_endpoint(ssm_value_dict)
-        if ssm_value_dict["source_api_records_key"] != "":
-          api_records=api_records[ssm_value_dict["source_api_records_key"]]
-          record_manager = RecordManager(api_records, ssm_value_dict)
-          record_manager.execute()
+        api_records = validate_api_records_exist(api_records, ssm_value_dict)
+        record_manager = RecordManager(api_records, ssm_value_dict)
+        record_manager.execute()
       except ValueError as e:
         message="No api_records have been found"
-        if e.message == message:
+        if str(e) == message:
           print(message)
       except Exception as e:
          raise e

@@ -5,7 +5,7 @@ import botocore.exceptions
 import botocore.errorfactory
 
 from modules.utils.validator import SSMValueDictValidator
-from modules.utils.validator import validate_api_records_exist
+
 
 class Scraper:
   """
@@ -71,7 +71,8 @@ class Scraper:
       r = requests.get(endpoint, headers=headers)
       if r.status_code == 200:
         api_records = r.json()
-        return validate_api_records_exist(api_records)
+        return api_records
+        # return validate_api_records_exist(api_records,ssm_value_dict)
       else:
         raise Exception(f'Error- status code: {r.status_code} - error message: {r.text}. Was unable to scrape api_records from endpoint - {endpoint}')
     except requests.exceptions.RequestException as e:

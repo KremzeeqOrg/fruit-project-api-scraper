@@ -2,7 +2,7 @@ import boto3
 import pytz
 import botocore
 from datetime import datetime
-from modules.utils.validator import validate_timestamp, validate_api_records_exist, validate_api_record_keys
+from modules.utils.validator import validate_timestamp, validate_api_record_keys
 
 class RecordManager:
   """
@@ -47,6 +47,8 @@ class RecordManager:
     records are uploaded to Dynamo DB 
     """
     keys_to_keep = sorted(list((field_mapping.keys())))
+    print("api_records[0]")
+    print(api_records)
     api_record_keys = sorted(list((api_records[0].keys()))) 
     keys_to_remove =  list(filter(lambda x: x not in keys_to_keep, api_record_keys))
     for record in api_records:
