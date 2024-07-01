@@ -47,8 +47,6 @@ class RecordManager:
     records are uploaded to Dynamo DB 
     """
     keys_to_keep = sorted(list((field_mapping.keys())))
-    print("api_records[0]")
-    print(api_records)
     api_record_keys = sorted(list((api_records[0].keys()))) 
     keys_to_remove =  list(filter(lambda x: x not in keys_to_keep, api_record_keys))
     for record in api_records:
