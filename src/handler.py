@@ -2,8 +2,8 @@ from modules.orchestrator import Orchestrator
 
 # testing locally
 
-event = {"app": "fruit-project-api-scraper",
-         "sourceApiName": "the-cocktail-db"}
+# event = {"app": "fruit-project-api-scraper",
+#          "sourceApiName": "fruity-vice"}
 
 def main(event, context):
     app = event["app"]
