@@ -2,8 +2,8 @@ from modules.orchestrator import Orchestrator
 
 # testing locally
 
-# event = {"app": "fruit-project-api-scraper",
-#          "sourceApiName": "fruity-vice"}
+event = {"app": "fruit-project-api-scraper",
+         "sourceApiName": "the-meal-db"}
 
 def main(event, context):
     app = event["app"]
@@ -12,4 +12,4 @@ def main(event, context):
     orchestrator.execute()
 
 if __name__ == '__main__':
-  main('', '')
+  main(event, '')

@@ -78,9 +78,8 @@ class Scraper:
             return api_records
           except Exception as e:
             derived_type = type(api_records)
-            raise Exception(f"'api_records' is not a list object. It is {derived_type}- Error - {e}")    
+            raise Exception(f"'api_records' is not a list object. It is {derived_type}").with_traceback(e.__traceback__)    
       else:
-        print("exception raised here")
-        raise Exception(f'Error- status code: {r.status_code} - error message: {r.text}')
+        raise Exception(f'Error- status code: {r.status_code} - error message: {r.text}. Was unable to scrape api_records from endpoint - {endpoint}')
     except requests.exceptions.RequestException as e:
       raise Exception(f'Error: {e}')

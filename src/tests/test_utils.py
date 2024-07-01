@@ -39,7 +39,6 @@ class TestUtils:
   def test_validate_source_api_name_in_ssm_value_dict(self, ssm_value_dict_validator, target_api_1_ssm_value_dict):
      try:
         ssm_value_dict_validator.validate_source_api_name_in_ssm_value_dict(TARGET_API_1, target_api_1_ssm_value_dict)
-    
      except ValueError as e:
         pytest.fail(e)
 
@@ -82,12 +81,11 @@ class TestUtils:
      assert api_records == target_api_1_records
 
   def test_validate_api_records_raises_exception_for_none_type(self):
-     NoneType = type(None)
      with pytest.raises(Exception):
-        validate_api_records_exist(NoneType)
+        validate_api_records_exist(None)
 
-  def test_validate_api_records_raises_exception_for_empty_list(self):
-     with pytest.raises(Exception):
+  def test_validate_api_records_raises_value_error_for_empty_list(self):
+     with pytest.raises(ValueError):
         validate_api_records_exist([])
 
   def test_validate_api_record_keys(self, target_api_1_records, target_api_1_field_mapping):
@@ -95,12 +93,12 @@ class TestUtils:
      
      assert validate_api_record_keys(target_api_1_records, target_api_1_field_mapping) == target_api_1_records
 
-  def test_validate_api_record_keys_raises_exception_for_extra_key_in_field_mapping(self, target_api_1_records, target_api_1_field_mapping):
+  def test_validate_api_record_keys_raises_key_error_for_extra_key_in_field_mapping(self, target_api_1_records, target_api_1_field_mapping):
      with pytest.raises(KeyError):
         target_api_1_field_mapping["extra_field"] = 'x'
         validate_api_record_keys(target_api_1_records[0], target_api_1_field_mapping)
 
-  def test_validate_api_record_keys_raises_exception_for_extra_key_in_api_records(self, target_api_1_records, target_api_1_records_with_dropped_fields_not_needed):
+  def test_validate_api_record_keys_raises_key_error_for_extra_key_in_api_records(self, target_api_1_records, target_api_1_records_with_dropped_fields_not_needed):
      with pytest.raises(KeyError):
         validate_api_record_keys(target_api_1_records[0], target_api_1_records_with_dropped_fields_not_needed)
 
