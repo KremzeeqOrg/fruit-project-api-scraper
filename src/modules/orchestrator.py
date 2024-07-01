@@ -32,10 +32,10 @@ class Orchestrator:
       """
       print("Enacting alphabetical scraping rule")    
       base_endpoint = ssm_value_dict["source_api_endpoint"]
-      # for i in alphabet:
-      print(f"Letter - a")
-      ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + "a"
-      self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
+      for i in alphabet:
+        print(f"Letter - i")
+        ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + i
+        self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
 
   def scrape_and_upload_records_to_dynamo_db(self, scraper, ssm_value_dict):
       try:
