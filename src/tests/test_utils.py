@@ -114,10 +114,6 @@ class TestUtils:
      target_api_1_records[0].pop('nutritions')  
      assert validate_api_record_keys(target_api_1_records, target_api_1_field_mapping) == target_api_1_records
 
-  def test_validate_api_record_keys(self, target_api_1_records, target_api_1_field_mapping):
-     target_api_1_records[0].pop('nutritions')  
-     assert validate_api_record_keys(target_api_1_records, target_api_1_field_mapping) == target_api_1_records
-
   def test_validate_api_record_keys_raises_value_error_for_extra_api_record_field(self, target_api_1_records, target_api_1_field_mapping):
      target_api_1_records[0].pop('nutritions')
      with pytest.raises(ValueError):
