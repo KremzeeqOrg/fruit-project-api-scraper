@@ -40,7 +40,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.deployed == "true" }}
+    if: ${{ needs.label-check.outputs.deployed == 'true' }}
     environment: "feature"
     steps:
     - name: Set AWS context
