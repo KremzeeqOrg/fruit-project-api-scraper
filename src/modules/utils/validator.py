@@ -1,4 +1,3 @@
-import sys
 from datetime import datetime
 
 class SSMValueDictValidator:
@@ -62,7 +61,7 @@ def validate_api_records_exist(api_records, ssm_value_dict):
       return api_records
     else:
       raise ValueError(f"{message}")
-  elif api_records == None:
+  elif api_records is None:
     raise ValueError(f"{message}")
 
 def validate_api_record_keys(api_records, field_mapping):
