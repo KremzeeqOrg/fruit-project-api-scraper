@@ -68,13 +68,13 @@ def validate_api_records_exist(api_records, ssm_value_dict):
 def validate_api_record_keys(api_records, field_mapping):
   api_record_keys=set(list(api_records[0].keys()))
   field_mapping_keys=set(list(field_mapping.keys()))
-  try: 
-    if api_record_keys == field_mapping_keys:
-      return api_records
-  except KeyError as e:
-      extra_keys_in_field_mapping = field_mapping_keys - api_record_keys
-      extra_keys_in_api_mapping = api_record_keys - field_mapping_keys
-      raise Exception(f"Here's extra_keys_in_field_mapping: {extra_keys_in_field_mapping}. \n Here's extra_keys_in_api_mapping: {extra_keys_in_api_mapping} \n api_record_keys : {api_record_keys} \n field_mapping_keys : {field_mapping_keys}").with_traceback(e.__traceback__)
+  if api_record_keys == field_mapping_keys:
+    return api_records
+  else:
+    extra_keys_in_field_mapping = field_mapping_keys - api_record_keys
+    extra_keys_in_api_mapping = api_record_keys - field_mapping_keys
+    print(f"Here's extra_keys_in_field_mapping: {extra_keys_in_field_mapping}.\nHere's extra_keys_in_api_mapping: {extra_keys_in_api_mapping} \n api_record_keys : {api_record_keys} \nfield_mapping_keys : {field_mapping_keys}")
+    raise ValueError(f"There's a mismatch between api_record_keys and field_mapping_keys")
 
   
 

@@ -33,10 +33,10 @@ class Orchestrator:
       print("Enacting alphabetical scraping rule")    
       base_endpoint = ssm_value_dict["source_api_endpoint"]
       for i in alphabet:
-        print(f'Scraping records for {ssm_value_dict["source_api"]}')
-        print(f"Letter - {i}")
-        ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + i
-        self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
+         print(f'Scraping records for {ssm_value_dict["source_api"]}')
+         print(f"Letter - {i}")
+         ssm_value_dict["source_api_endpoint"] = base_endpoint + api_mapping_manager.scraping_rule_dict["query"] + i
+         self.scrape_and_upload_records_to_dynamo_db(scraper, ssm_value_dict)
 
   def scrape_and_upload_records_to_dynamo_db(self, scraper, ssm_value_dict):
       try:
@@ -46,8 +46,12 @@ class Orchestrator:
         record_manager = RecordManager(api_records, ssm_value_dict)
         record_manager.execute()
       except ValueError as e:
-        message="No api_records have been found"
-        if str(e) == message:
-          print(message)
+        message_1="No api_records have been found"
+        message_2="There's a mismatch between api_record_keys and field_mapping_keys"
+        if str(e) == message_1:
+          print(message_1)
+        elif str(e) == message_2:
+          print(message_2)
+          raise e
       except Exception as e:
          raise e
