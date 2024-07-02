@@ -55,3 +55,13 @@ jobs:
       with:
         stack-name: ${{ env.APP }}-feature
         region: ${{ secrets.AWS_REGION }}
+    - id: set_deployment_as_inactive
+      name: Set deployment status as inactive
+      uses: rsotnychenko/deployment-status-update@0.2.1
+      with:
+        status: 'inactive'
+        run_id: ${{ github.run_id }}
+        environment_url: https://api.github.com/KremzeeqOrg/fruit-project-api-scraper/deployments/feature
+        auto_inactive: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

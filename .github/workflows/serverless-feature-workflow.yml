@@ -64,4 +64,34 @@ jobs:
       dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
       serverless-access-key: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
+  feature-cloudformation-stack-teardown:
+    needs: [label-check, serverless-deploy]
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    environment: "feature"
+    steps:
+    - name: Set AWS context
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.FRUIT_PROJECT_DEV_AWS_ACCOUNT_ACCESS_ROLE }}
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ secrets.AWS_REGION }}
+        mask-aws-account-id: true
+    - name: Delete stack
+      uses: go-to-k/delstack@v1.8.0
+      with:
+        stack-name: ${{ env.APP }}-feature
+        region: ${{ secrets.AWS_REGION }}
+    - id: set_deployment_as_inactive
+      name: Set deployment status as inactive
+      uses: rsotnychenko/deployment-status-update@0.2.1
+      with:
+        status: 'inactive'
+        run_id: ${{ github.run_id }}
+        environment_url: https://api.github.com/KremzeeqOrg/fruit-project-api-scraper/deployments/feature
+        auto_inactive: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
