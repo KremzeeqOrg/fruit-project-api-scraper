@@ -24,6 +24,7 @@ jobs:
       with:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
+        allow_failure: true
     - run: |
         if [[ ${{ steps.deploy_label_check.outputs.label_check }} == "success" ]]; then
 
