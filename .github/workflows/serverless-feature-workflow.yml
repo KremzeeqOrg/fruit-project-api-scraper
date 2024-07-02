@@ -4,6 +4,10 @@ on:
       - main
     types: [labeled, opened, synchronize, reopened]
 
+env:
+  APP: "fruit-project-api-scraper"
+  ENV: feature
+
 concurrency:
   group: feature
   cancel-in-progress: true
@@ -70,7 +74,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    environment: "feature"
+    environment: feature
     steps:
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
