@@ -17,7 +17,7 @@ jobs:
     name: "Teardown Serverless Cloudformation Stack"
     runs-on: ubuntu-latest
     outputs:
-      deployed: ${{ steps.deploy_label_check.outputs.deployed }}
+      deployed: ${{ steps.deploy_label_check.outputs.set_output }}
     steps:
     - id: deploy_label_check
       uses: docker://agilepathway/pull-request-label-checker:latest
@@ -25,7 +25,8 @@ jobs:
         one_of: deploy
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         allow_failure: true
-    - run: |
+    - id: set_output
+      run: |
         if [[ ${{ steps.deploy_label_check.outputs.label_check }} == "success" ]]; then
 
           echo "deployed=true" >> "$GITHUB_OUTPUT"
@@ -39,7 +40,8 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.deployed }} == true
+    if: ${{ needs.label-check.outputs.deployed == "true" }}
+    environment: "feature"
     steps:
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
