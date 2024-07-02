@@ -39,7 +39,7 @@ jobs:
       id-token: write
       contents: read
     runs-on: ubuntu-latest
-    if: ${{ needs.label-check.outputs.deployed }} == true
+    if: ${{ needs.label-check.outputs.deployed == 'true' }}
     steps:
     - name: Set AWS context
       uses: aws-actions/configure-aws-credentials@v4
