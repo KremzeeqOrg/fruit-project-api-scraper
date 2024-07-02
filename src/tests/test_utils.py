@@ -110,33 +110,22 @@ class TestUtils:
      with pytest.raises(ValueError):
         validate_api_records_exist([], target_api_1_ssm_value_dict)
 
-
-# def validate_api_records_exist(api_records, ssm_value_dict):
-#   message="No api_records have been found"
-#   if isinstance(api_records, dict):
-#     api_records=api_records[ssm_value_dict["source_api_records_key"]]
-#   if isinstance(api_records, list):
-#     length= len(api_records)
-#     if length > 0:
-#       return api_records
-#   elif api_records == None or length==0:
-#     raise ValueError(f"{message}")
-
-
   def test_validate_api_record_keys(self, target_api_1_records, target_api_1_field_mapping):
-     target_api_1_records[0].pop('nutritions')
-     
+     target_api_1_records[0].pop('nutritions')  
      assert validate_api_record_keys(target_api_1_records, target_api_1_field_mapping) == target_api_1_records
 
-  def test_validate_api_record_keys_raises_key_error_for_extra_key_in_field_mapping(self, target_api_1_records, target_api_1_field_mapping):
-     with pytest.raises(KeyError):
-        target_api_1_field_mapping["extra_field"] = 'x'
-        validate_api_record_keys(target_api_1_records[0], target_api_1_field_mapping)
+  def test_validate_api_record_keys(self, target_api_1_records, target_api_1_field_mapping):
+     target_api_1_records[0].pop('nutritions')  
+     assert validate_api_record_keys(target_api_1_records, target_api_1_field_mapping) == target_api_1_records
 
-  def test_validate_api_record_keys_raises_key_error_for_extra_key_in_api_records(self, target_api_1_records, target_api_1_records_with_dropped_fields_not_needed):
-     with pytest.raises(KeyError):
-        validate_api_record_keys(target_api_1_records[0], target_api_1_records_with_dropped_fields_not_needed)
+  def test_validate_api_record_keys_raises_value_error_for_extra_api_record_field(self, target_api_1_records, target_api_1_field_mapping):
+     target_api_1_records[0].pop('nutritions')
+     with pytest.raises(ValueError):
+         target_api_1_records[0]["extra_field"] = 'x'
+         validate_api_record_keys(target_api_1_records, target_api_1_field_mapping)
 
-
-
-     
+  def test_validate_api_record_keys_raises_value_error_for_extra_field_mapping_field(self, target_api_1_records, target_api_1_field_mapping):
+     target_api_1_records[0].pop('nutritions')
+     with pytest.raises(ValueError):
+         target_api_1_field_mapping["extra_field"] = 'x'
+         validate_api_record_keys(target_api_1_records, target_api_1_field_mapping)

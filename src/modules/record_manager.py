@@ -24,6 +24,7 @@ class RecordManager:
     print("Starting executing RecordManager")
     
     self.api_records = self.transform_data_for_upload(self.api_records)
+
     record_batches = self.get_record_batches(self.api_records, self.dynamo_db_batch_size)
     self.upload_batches_to_dynamo_db(record_batches)
     print("Finished executing RecordManager")
