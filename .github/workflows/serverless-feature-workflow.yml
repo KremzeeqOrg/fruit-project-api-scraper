@@ -79,6 +79,10 @@ jobs:
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
         aws-region: ${{ secrets.AWS_REGION }}
         mask-aws-account-id: true
+    - name: Wait 5 minutes
+      uses: GuillaumeFalourd/wait-sleep-action@v1
+      with:
+        time: '5m'
     - name: Delete stack
       uses: go-to-k/delstack@v1.8.0
       with:
