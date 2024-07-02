@@ -73,7 +73,7 @@ def validate_api_record_keys(api_records, field_mapping):
     extra_keys_in_field_mapping = field_mapping_keys - api_record_keys
     extra_keys_in_api_mapping = api_record_keys - field_mapping_keys
     print(f"Here's extra_keys_in_field_mapping: {extra_keys_in_field_mapping}.\nHere's extra_keys_in_api_mapping: {extra_keys_in_api_mapping} \n api_record_keys : {api_record_keys} \nfield_mapping_keys : {field_mapping_keys}")
-    raise ValueError(f"There's a mismatch between api_record_keys and field_mapping_keys")
+    raise ValueError("There's a mismatch between api_record_keys and field_mapping_keys")
 
   
 
