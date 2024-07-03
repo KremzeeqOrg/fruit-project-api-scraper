@@ -20,4 +20,6 @@ ENV PATH="${LAMBDA_TASK_ROOT}/newuser/.local/bin:${PATH}"
 
 COPY --chown=newuser:newuser src/ .
 
-CMD [ "handler.main" ]
+RUN ls
+
+CMD [ "src.handler.main" ]
