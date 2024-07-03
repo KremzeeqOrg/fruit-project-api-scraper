@@ -57,9 +57,9 @@ jobs:
         docker_hub_uri="${{ secrets.dockerhub-username }}/${latest_tag}"
 
         if [ ${{ vars.ENV }} == 'feature' ] || [ ${{ vars.ENV }} == 'dev' ]; then
-          docker build --platform linux/amd64 -t ${commit_tag} .
+          docker build --platform linux/amd64 -t ${commit_tag} -t ${aws_image_uri}/${commit_tag} .
           if [ ${{ vars.ENV }} == 'feature' ]; then
-            docker push ${aws_image_uri}
+            docker push ${aws_image_uri}/${commit_tag}
           elif [ ${{ vars.ENV }} == 'dev' ]; then
             docker tag $commit_tag} ${latest_tag}
             docker push ${aws_image_uri}
