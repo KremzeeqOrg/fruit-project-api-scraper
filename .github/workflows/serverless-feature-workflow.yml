@@ -4,10 +4,6 @@ on:
       - main
     types: [labeled, opened, synchronize, reopened]
 
-env:
-  APP: "fruit-project-api-scraper"
-  ENV: feature
-
 concurrency:
   group: feature
   cancel-in-progress: true
