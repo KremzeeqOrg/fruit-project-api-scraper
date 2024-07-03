@@ -4,8 +4,8 @@ RUN pip install pip --upgrade
 
 RUN cat /etc/passwd
 RUN echo ${LAMBDA_TASK_ROOT}
-# RUN yum update -y
-# RUN yum install -y shadow-utils
+RUN yum update -y
+RUN yum install -y shadow-utils
 
 RUN useradd -m newuser
 USER newuser
