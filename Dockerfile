@@ -2,13 +2,9 @@ FROM public.ecr.aws/lambda/python:3.11
 
 RUN pip install pip --upgrade
 
-RUN cat /etc/passwd
-RUN echo ${LAMBDA_TASK_ROOT}
-# Install shadow-utils to get useradd command
-# RUN yum update -y && yum install -y shadow-utils
+#Install shadow-utils to get useradd command
+RUN yum update -y && yum install -y shadow-utils
 
-# Ensure useradd is available and check its location
-RUN command -v /usr/sbin/useradd
 RUN /usr/sbin/useradd -m newuser
 USER newuser
 
