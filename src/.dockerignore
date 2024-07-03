@@ -9,8 +9,8 @@ src/tests/__pycache__
 src/tests/__pycache__/*
 src/tests/.pytests_cache
 src/tests/.pytests_cache/*
+test_sample_records
 execute.sh
 package-lock.json
 node_modules
 tests
-execute.sh
