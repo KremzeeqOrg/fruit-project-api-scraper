@@ -4,13 +4,13 @@ RUN pip install pip --upgrade
 
 RUN cat /etc/passwd
 RUN echo ${LAMBDA_TASK_ROOT}
-RUN apt-get update
-RUN apt-get install adduser
+RUN yum update -y
+RUN yum install -y shadow-utils
 
-RUN adduser -D newuser
+RUN adduser -m newuser
 USER newuser
 
-# Set the working directory to the Lambda task root
+# Set the working directory to the Lambda task directoy for the newuser
 WORKDIR ${LAMBDA_TASK_ROOT}/newuser
 
 COPY --chown=newuser:newuser requirements.txt requirements.txt
