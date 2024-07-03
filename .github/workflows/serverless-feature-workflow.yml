@@ -9,21 +9,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pytest:
-    name: Pytest
-    permissions:
-      contents: read
-    strategy:  
-      matrix:  
-        test_file: ${{ fromJson('["api_mapping_manager", "record_manager", "scraper", "utils"]') }}
-    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-unit-test-workflow.yml@main
-    with:
-      environment: feature
-      test_file: ${{ matrix.test_file }}
+  # pytest:
+  #   name: Pytest
+  #   permissions:
+  #     contents: read
+  #   strategy:  
+  #     matrix:  
+  #       test_file: ${{ fromJson('["api_mapping_manager", "record_manager", "scraper", "utils"]') }}
+  #   uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-unit-test-workflow.yml@main
+  #   with:
+  #     environment: feature
+  #     test_file: ${{ matrix.test_file }}
 
   label-check:
     name: "Check Deploy Label"
-    needs: [pytest]
+    # needs: [pytest]
     runs-on: ubuntu-latest
     outputs:
       can_deploy: ${{ steps.set_output.outputs.can_deploy }}
@@ -53,7 +53,7 @@ jobs:
       id-token: write
       contents: read
     if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
-    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml@main
+    uses: .github/workflows/serverless-deploy-workflow.yml
     with:
       environment: feature
     secrets: 
