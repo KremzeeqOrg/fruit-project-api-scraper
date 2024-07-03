@@ -8,9 +8,9 @@ RUN echo ${LAMBDA_TASK_ROOT}
 RUN yum update -y && yum install -y shadow-utils
 RUN ls /usr/sbin/
 
-# Ensure useradd is available
-RUN which useradd
-RUN useradd -m newuser
+# Ensure useradd is available and check its location
+RUN command -v /usr/sbin/useradd
+RUN /usr/sbin/useradd -m newuser
 USER newuser
 
 # Set the working directory to the Lambda task directoy for the newuser
