@@ -22,7 +22,7 @@ provider:
   ecr:
     images:
       appImage:
-        uri: ${param:imageURI}
+        uri: ${param:image_uri}
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
