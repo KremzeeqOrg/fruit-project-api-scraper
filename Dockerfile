@@ -6,7 +6,7 @@ RUN cat /etc/passwd
 RUN echo ${LAMBDA_TASK_ROOT}
 # Install shadow-utils to get useradd command
 RUN yum update -y && yum install -y shadow-utils
-RUN yum list installed
+RUN ls /usr/sbin/
 
 # Ensure useradd is available
 RUN which useradd
