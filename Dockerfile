@@ -16,9 +16,7 @@ COPY --chown=newuser:newuser requirements.txt requirements.txt
 # Install dependencies for Python app
 RUN pip install --user --no-cache-dir -r requirements.txt
 
-ENV PATH="${LAMBDA_TASK_ROOT}/.local/bin:${PATH}"
-
-ENV PATH="/home/newuser/.local/bin:${PATH}"
+ENV PATH="${LAMBDA_TASK_ROOT}/.local/bin:/home/newuser/.local/bin:${PATH}"
 
 COPY --chown=newuser:newuser src/ .
 
