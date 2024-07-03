@@ -22,4 +22,4 @@ COPY --chown=newuser:newuser src/ .
 
 RUN ls
 
-CMD [ "src.handler.main" ]
+CMD [ "handler.main" ]
