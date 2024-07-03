@@ -4,7 +4,7 @@ RUN pip install pip --upgrade
 
 RUN cat /etc/passwd
 RUN echo ${LAMBDA_TASK_ROOT}
-RUN sudo apt-get update
+RUN apt-get update
 RUN apt-get install adduser
 
 RUN adduser -D newuser
