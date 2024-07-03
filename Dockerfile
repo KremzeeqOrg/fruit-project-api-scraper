@@ -1,14 +1,22 @@
 FROM public.ecr.aws/lambda/python:3.11
 
-# Set the working directory to the Lambda task root
-WORKDIR ${LAMBDA_TASK_ROOT}
+RUN pip install pip --upgrade
 
-#COPY requirements.txt ./
-COPY requirements.txt .
+RUN adduser -D newuser
+USER newuser
+
+RUN echo ${LAMBDA_TASK_ROOT}
+
+# Set the working directory to the Lambda task root
+WORKDIR ${LAMBDA_TASK_ROOT}/newuser
+
+COPY --chown=newuser:newuser requirements.txt requirements.txt
 
 # Install dependencies for Python app
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --user --no-cache-dir -r requirements.txt
 
-COPY src/ .
+ENV PATH="${LAMBDA_TASK_ROOT}/newuser/.local/bin:${PATH}"
+
+COPY --chown==newuser:newuser src/ .
 
 CMD [ "handler.main" ]
