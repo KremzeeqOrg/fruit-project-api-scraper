@@ -18,7 +18,7 @@ RUN pip install --user --no-cache-dir -r requirements.txt
 
 ENV PATH="${LAMBDA_TASK_ROOT}/.local/bin:${PATH}"
 
-ENV PATH="/home/newuser/.local/bin:${PATH}""
+ENV PATH="/home/newuser/.local/bin:${PATH}"
 
 COPY --chown=newuser:newuser src/ .
 
