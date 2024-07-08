@@ -80,7 +80,7 @@ jobs:
             echo "Docker pull failed. Image not found: ${docker_hub_latest_uri}"
             exit 1
           fi
-          docker tag ${docker_hub_commit_uri} ${aws_ecr_commit_uri}
+          docker tag ${docker_hub_latest_uri} ${aws_ecr_commit_uri}
           docker tag ${aws_ecr_commit_uri} ${aws_ecr_latest_uri}
           docker push ${aws_ecr_commit_uri}
           docker push ${aws_ecr_latest_uri}
