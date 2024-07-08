@@ -47,7 +47,7 @@ jobs:
     - name: "Docker push to AWS ECR"
       id: docker-push
       env:
-        AWS_ECR: ${{ secrets.aws-account-id }}.dkr.ecr.${{ secrets.aws-region }}.amazonaws.com
+        AWS_ECR_REPO: ${{ secrets.aws-account-id }}.dkr.ecr.${{ secrets.aws-region }}.amazonaws.com
       run: |
         app_latest_tag="${{ vars.APP }}:latest"
         commit_sha_short=$(git rev-parse --short HEAD)
