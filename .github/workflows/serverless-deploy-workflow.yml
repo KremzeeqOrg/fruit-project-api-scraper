@@ -55,6 +55,7 @@ jobs:
 
         aws_ecr_commit_uri="${{ env.AWS_ECR_REPO }}/${commit_tag}"
         aws_ecr_latest_uri="${{ env.AWS_ECR_REPO }}/${app_latest_tag}"
+        
         docker_hub_commit_uri="${{ secrets.dockerhub-username }}/${commit_tag}"
         docker_hub_latest_uri="${{ secrets.dockerhub-username }}/${app_latest_tag}"
 
