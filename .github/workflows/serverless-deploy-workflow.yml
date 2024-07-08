@@ -49,40 +49,48 @@ jobs:
       env:
         AWS_ECR: ${{ secrets.aws-account-id }}.dkr.ecr.${{ secrets.aws-region }}.amazonaws.com
       run: |
-        latest_tag="${{ vars.APP }}:latest"
-        sha_short=$(git rev-parse --short HEAD)
+        app_latest_tag="${{ vars.APP }}:latest"
+        commit_sha_short=$(git rev-parse --short HEAD)
 
-        commit_tag="${{ vars.APP }}:${{ vars.ENV }}-${sha_short}"
-        aws_ecr_uri_commit="${{ env.AWS_ECR }}/${commit_tag}"
-        aws_ecr_uri_latest="${{ env.AWS_ECR }}/${latest_tag}"
-        docker_hub_uri_commit="${{ secrets.dockerhub-username }}/${commit_tag}"
-        docker_hub_uri_latest="${{ secrets.dockerhub-username }}/${latest_tag}"
+        commit_tag="${{ vars.APP }}:${{ vars.ENV }}-${commit_sha_short}"
+        aws_ecr_commit_uri="${{ env.AWS_ECR_REPO }}/${commit_tag}"
+        aws_ecr_latest_uri="${{ env.AWS_ECR_REPO }}/${app_latest_tag}"
+        docker_hub_commit_uri="${{ secrets.dockerhub-username }}/${commit_tag}"
+        docker_hub_latest_uri="${{ secrets.dockerhub-username }}/${app_latest_tag}"
 
-        if [ ${{ vars.ENV }} == 'feature' ] || [ ${{ vars.ENV }} == 'dev' ]; then
-          docker build --platform linux/amd64 -t ${commit_tag} -t ${aws_ecr_uri_commit} .
+        build_and_push_feature_or_dev() {
+          docker build --platform linux/amd64 -t ${commit_tag} -t ${aws_ecr_commit_uri} .
           if [ ${{ vars.ENV }} == 'feature' ]; then
-            docker push ${aws_ecr_uri_commit}
+            docker push ${aws_ecr_commit_uri}
           elif [ ${{ vars.ENV }} == 'dev' ]; then
-            docker tag ${aws_ecr_uri_commit} ${aws_image_uri_latest}
-            docker tag ${aws_ecr_uri_commit} ${docker_hub_uri_commit}
-            docker tag ${aws_ecr_uri_commit} ${docker_hub_uri_latest}
+            docker tag ${aws_ecr_commit_uri} ${aws_ecr_latest_uri}
+            docker tag ${aws_ecr_commit_uri} ${docker_hub_commit_uri}
+            docker tag ${aws_ecr_commit_uri} ${docker_hub_latest_uri}
 
-            docker push ${docker_hub_uri_commit}
-            docker push ${aws_ecr_uri_latest}
-            docker push ${docker_hub_uri_commit}
-            docker push ${docker_hub_uri_latest}
+            docker push ${docker_hub_commit_uri}
+            docker push ${aws_ecr_latest_uri}
+            docker push ${docker_hub_commit_uri}
+            docker push ${docker_hub_latest_uri}
           fi
-        elif [ ${{ vars.ENV }} == 'prod' ]; then
-          docker pull ${docker_hub_uri}
+        }
+
+        push_prod() {
+          docker pull ${docker_hub_latest_uri}
           if [ $? -ne 0 ]; then
-            echo "Docker pull failed. Image not found: ${docker_hub_uri}"
+            echo "Docker pull failed. Image not found: ${docker_hub_latest_uri}"
             exit 1
           fi
-          docker tag $docker_hub_uri ${commit_tag}
-          docker push ${aws_image_uri}
+          docker tag ${docker_hub_commit_uri} ${aws_ecr_commit_uri}
+          docker tag ${aws_ecr_commit_uri} ${aws_ecr_latest_uri}
+          docker push ${docker_hub_commit_uri}
+          docker push ${docker_hub_latest_uri}
+        }
+
+        if [ ${{ vars.ENV }} == 'feature' ] || [ ${{ vars.ENV }} == 'dev' ]; then
+          build_and_push_feature_or_dev
+        elif [ ${{ vars.ENV }} == 'prod' ]; then
+          push_prod
         fi
-        echo "image_uri=${aws_image_uri}" >> "$GITHUB_OUTPUT"
-    # - name: Use Node.js ${{ vars.NODE_VERSION }}
     #   uses: actions/setup-node@v4
     #   with:
     #     node-version: ${{ vars.NODE_VERSION }}
