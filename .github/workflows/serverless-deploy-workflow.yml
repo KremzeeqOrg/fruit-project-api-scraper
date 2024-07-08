@@ -55,7 +55,8 @@ jobs:
         commit_tag="${{ vars.APP }}:${{ vars.ENV }}-${sha_short}"
         aws_image_uri="${{ env.AWS_ECR }}/${commit_tag}"
         aws_image_uri_latest="${{ env.AWS_ECR }}/${latest_tag}"
-        docker_hub_uri="${{ secrets.dockerhub-username }}/${latest_tag}"
+        docker_hub_uri="${{ secrets.dockerhub-username }}/${commit_tag}"
+        docker_hub_uri_latest="${{ secrets.dockerhub-username }}/${latest_tag}"
 
         if [ ${{ vars.ENV }} == 'feature' ] || [ ${{ vars.ENV }} == 'dev' ]; then
           docker build --platform linux/amd64 -t ${commit_tag} -t ${aws_image_uri} .
@@ -63,6 +64,9 @@ jobs:
             docker push ${aws_image_uri}
           elif [ ${{ vars.ENV }} == 'dev' ]; then
             docker tag ${aws_image_uri} ${aws_image_uri_latest}
+            docker tag ${aws_image_uri} ${docker_hub_uri}
+            docker tag ${aws_image_uri} ${docker_hub_uri_latest}
+
             docker push ${aws_image_uri}
             docker push ${aws_image_uri_latest}
             docker push ${docker_hub_uri}
