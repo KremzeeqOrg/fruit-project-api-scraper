@@ -65,6 +65,7 @@ jobs:
             # docker tag ${commit_tag} latest
             docker tag ${aws_image_uri} ${aws_image_uri_latest}
             docker push ${aws_image_uri}
+            docker push ${aws_image_uri_latest}
 
             #docker push ${docker_hub_uri}
           fi
