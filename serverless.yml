@@ -48,9 +48,8 @@ provider:
           Resource: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${self:service}--*
 
 functions:
-  app:
+  fruit-project-api-scraper:
     image:
-      name: ${param:functionName}
       uri: ${param:image_uri}
 
 stepFunctions:
