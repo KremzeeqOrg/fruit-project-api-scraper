@@ -54,6 +54,7 @@ jobs:
 
         commit_tag="${{ vars.APP }}:${{ vars.ENV }}-${sha_short}"
         aws_image_uri="${{ env.AWS_ECR }}/${commit_tag}"
+        aws_image_uri_latest="${{ env.AWS_ECR }}/${latest_tag}"
         docker_hub_uri="${{ secrets.dockerhub-username }}/${latest_tag}"
 
         if [ ${{ vars.ENV }} == 'feature' ] || [ ${{ vars.ENV }} == 'dev' ]; then
@@ -62,7 +63,7 @@ jobs:
             docker push ${aws_image_uri}
           elif [ ${{ vars.ENV }} == 'dev' ]; then
             # docker tag ${commit_tag} latest
-            docker tag ${aws_image_uri} latest
+            docker tag ${aws_image_uri} ${aws_image_uri_latest}
             docker push ${aws_image_uri}
 
             #docker push ${docker_hub_uri}
