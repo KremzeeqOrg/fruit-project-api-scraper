@@ -61,10 +61,10 @@ jobs:
           if [ ${{ vars.ENV }} == 'feature' ]; then
             docker push ${aws_image_uri}
           elif [ ${{ vars.ENV }} == 'dev' ]; then
-            docker tag ${commit_tag} latest
+            # docker tag ${commit_tag} latest
             docker push ${aws_image_uri}
 
-            docker push ${docker_hub_uri}
+            #docker push ${docker_hub_uri}
           fi
         elif [ ${{ vars.ENV }} == 'prod' ]; then
           docker pull ${docker_hub_uri}
