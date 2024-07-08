@@ -67,6 +67,7 @@ jobs:
             docker push ${aws_image_uri}
             docker push ${aws_image_uri_latest}
             # docker push ${docker_hub_uri}
+            
           fi
         elif [ ${{ vars.ENV }} == 'prod' ]; then
           docker pull ${docker_hub_uri}
