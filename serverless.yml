@@ -53,8 +53,8 @@ provider:
 
 functions:
   app:
-    name: ${param:functionName}
     image: appImage
+      name: ${param:functionName}
 
 stepFunctions:
   stateMachines:

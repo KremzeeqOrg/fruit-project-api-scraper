@@ -44,7 +44,7 @@ jobs:
       with:
         username: ${{ secrets.dockerhub-username }}
         password: ${{ secrets.dockerhub-token }}
-    - name: "Docker push to AWS ECR"
+    - name: Docker push to AWS ECR
       id: docker-push
       env:
         AWS_ECR_REPO: ${{ secrets.aws-account-id }}.dkr.ecr.${{ secrets.aws-region }}.amazonaws.com
@@ -55,7 +55,7 @@ jobs:
 
         aws_ecr_commit_uri="${{ env.AWS_ECR_REPO }}/${commit_tag}"
         aws_ecr_latest_uri="${{ env.AWS_ECR_REPO }}/${app_latest_tag}"
-        
+
         docker_hub_commit_uri="${{ secrets.dockerhub-username }}/${commit_tag}"
         docker_hub_latest_uri="${{ secrets.dockerhub-username }}/${app_latest_tag}"
 
@@ -93,15 +93,16 @@ jobs:
         elif [ ${{ vars.ENV }} == 'prod' ]; then
           push_prod
         fi
-    #   uses: actions/setup-node@v4
-    #   with:
-    #     node-version: ${{ vars.NODE_VERSION }}
-    # - name: serverless deploy
-    #   run: | 
-    #     npm i -g serverless@${{ vars.SERVERLESS_VERSION }}
-    #     npm install && npm list -g
-    #     image_uri="image_uri=${{ steps.docker-push.outputs.image_uri }}"
-    #     serverless deploy --stage ${{ vars.ENV }} --param=${image_uri}
-    #   env:
-    #     SERVERLESS_ACCESS_KEY: ${{ secrets.serverless-access-key }}
+         echo "image_uri=${aws_ecr_commit_uri}" >> "$GITHUB_OUTPUT"
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ vars.NODE_VERSION }}
+    - name: serverless deploy
+      run: | 
+        npm i -g serverless@${{ vars.SERVERLESS_VERSION }}
+        npm install && npm list -g
+        image_uri="image_uri=${{ steps.docker-push.outputs.image_uri }}"
+        serverless deploy --stage ${{ vars.ENV }} --param=${image_uri}
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.serverless-access-key }}
 
