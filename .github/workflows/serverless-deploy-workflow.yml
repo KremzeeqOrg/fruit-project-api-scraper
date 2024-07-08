@@ -62,6 +62,7 @@ jobs:
             docker push ${aws_image_uri}
           elif [ ${{ vars.ENV }} == 'dev' ]; then
             # docker tag ${commit_tag} latest
+            docekr tag latest ${aws_image_uri}
             docker push ${aws_image_uri}
 
             #docker push ${docker_hub_uri}
@@ -76,16 +77,16 @@ jobs:
           docker push ${aws_image_uri}
         fi
         echo "image_uri=${aws_image_uri}" >> "$GITHUB_OUTPUT"
-    - name: Use Node.js ${{ vars.NODE_VERSION }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ vars.NODE_VERSION }}
-    - name: serverless deploy
-      run: | 
-        npm i -g serverless@${{ vars.SERVERLESS_VERSION }}
-        npm install && npm list -g
-        image_uri="image_uri=${{ steps.docker-push.outputs.image_uri }}"
-        serverless deploy --stage ${{ vars.ENV }} --param=${image_uri}
-      env:
-        SERVERLESS_ACCESS_KEY: ${{ secrets.serverless-access-key }}
+    # - name: Use Node.js ${{ vars.NODE_VERSION }}
+    #   uses: actions/setup-node@v4
+    #   with:
+    #     node-version: ${{ vars.NODE_VERSION }}
+    # - name: serverless deploy
+    #   run: | 
+    #     npm i -g serverless@${{ vars.SERVERLESS_VERSION }}
+    #     npm install && npm list -g
+    #     image_uri="image_uri=${{ steps.docker-push.outputs.image_uri }}"
+    #     serverless deploy --stage ${{ vars.ENV }} --param=${image_uri}
+    #   env:
+    #     SERVERLESS_ACCESS_KEY: ${{ secrets.serverless-access-key }}
 
