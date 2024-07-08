@@ -62,7 +62,7 @@ jobs:
             docker push ${aws_image_uri}
           elif [ ${{ vars.ENV }} == 'dev' ]; then
             # docker tag ${commit_tag} latest
-            docekr tag latest ${aws_image_uri}
+            docker tag latest ${aws_image_uri}
             docker push ${aws_image_uri}
 
             #docker push ${docker_hub_uri}
