@@ -19,10 +19,6 @@ params:
      
 provider:
   name: aws
-  ecr:
-    images:
-      appImage:
-        uri: ${param:image_uri}
   region: eu-west-2
   runtimeManagement: auto
   memorySize: 512
@@ -53,8 +49,9 @@ provider:
 
 functions:
   app:
-    image: appImage
+    image:
       name: ${param:functionName}
+      uri: ${param:image_uri}
 
 stepFunctions:
   stateMachines:
