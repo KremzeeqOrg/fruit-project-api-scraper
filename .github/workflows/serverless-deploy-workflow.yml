@@ -53,23 +53,23 @@ jobs:
         sha_short=$(git rev-parse --short HEAD)
 
         commit_tag="${{ vars.APP }}:${{ vars.ENV }}-${sha_short}"
-        aws_image_uri="${{ env.AWS_ECR }}/${commit_tag}"
-        aws_image_uri_latest="${{ env.AWS_ECR }}/${latest_tag}"
-        docker_hub_uri="${{ secrets.dockerhub-username }}/${commit_tag}"
+        aws_ecr_uri_commit="${{ env.AWS_ECR }}/${commit_tag}"
+        aws_ecr_uri_latest="${{ env.AWS_ECR }}/${latest_tag}"
+        docker_hub_uri_commit="${{ secrets.dockerhub-username }}/${commit_tag}"
         docker_hub_uri_latest="${{ secrets.dockerhub-username }}/${latest_tag}"
 
         if [ ${{ vars.ENV }} == 'feature' ] || [ ${{ vars.ENV }} == 'dev' ]; then
-          docker build --platform linux/amd64 -t ${commit_tag} -t ${aws_image_uri} .
+          docker build --platform linux/amd64 -t ${commit_tag} -t ${aws_ecr_uri_commit} .
           if [ ${{ vars.ENV }} == 'feature' ]; then
-            docker push ${aws_image_uri}
+            docker push ${aws_ecr_uri_commit}
           elif [ ${{ vars.ENV }} == 'dev' ]; then
-            docker tag ${aws_image_uri} ${aws_image_uri_latest}
-            docker tag ${aws_image_uri} ${docker_hub_uri}
-            docker tag ${aws_image_uri} ${docker_hub_uri_latest}
+            docker tag ${aws_ecr_uri_commit} ${aws_image_uri_latest}
+            docker tag ${aws_ecr_uri_commit} ${docker_hub_uri_commit}
+            docker tag ${aws_ecr_uri_commit} ${docker_hub_uri_latest}
 
-            docker push ${aws_image_uri}
-            docker push ${aws_image_uri_latest}
-            docker push ${docker_hub_uri}
+            docker push ${docker_hub_uri_commit}
+            docker push ${aws_ecr_uri_latest}
+            docker push ${docker_hub_uri_commit}
             docker push ${docker_hub_uri_latest}
           fi
         elif [ ${{ vars.ENV }} == 'prod' ]; then
