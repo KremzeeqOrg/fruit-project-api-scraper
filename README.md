@@ -96,19 +96,26 @@ See [Setting up AWS SSM Parameters for target APIs](#setting-up-aws-ssm-paramete
 
 <details>
 
-- When you raise a PR against the `main` branch, tag it with a `deploy` label to test out a docker build and deployment to the GitHub `feature` environment. This will provision resources as per the `serverless.yml` file and the resources will include `feature` in their name. The related workflow is [here](./.github/workflows/serverless-feature-workflow.yml)
+- When you raise a PR against the `main` branch, tag it with a `deploy` label to test out a docker build and deployment to the GitHub `feature` environment. This will provision resources as per the `serverless.yml` file and the resources will include:
+
+- Lambda: `fruit-project-api-scraper-feature`
+- AWS Step Functiosn state machine: `fruit-project-api-scraper-state-machine-feature`.
+
+The related workflow is [here](./.github/workflows/serverless-feature-workflow.yml)
+
 - When PRs are closed, a [teardown workflow](./.github/workflows/serverless-feature-teardown.yml) is triggered to destroy the cloudformation stack provisioned for the `feature` environment.
-- The `fruit-project` relies on `feature` deployments being provisoned to the same AWS environment as the `dev` AWS account.
+- The `fruit-project` relies on `feature` deployments being provisioned to the same AWS environment as the `dev` AWS account.
 - The lambda and state machine for the `feature` deployment will push api records to the same DynamoDB tables as the `dev` environment.
 
 </details>
 
 ### GitHub Actions Workflow Configuration
 
-- The GitHub Actions workflows for this repo, use a reusuable workflow [serverless-deploy-workflow.yml](https://github.com/KremzeeqOrg/gha-reusable-workflows/blob/main/.github/workflows/serverless-deploy-workflow.yml). This requires environment variables and secrets to be set for 3 different GitHub environments (`dev`, `prod` and `feature`). See 'Variables for Serverless Deploy workflow' [here](https://github.com/KremzeeqOrg/gha-reusable-workflows/tree/main#environment-variables). This should be considered as separate to GitHub secrets.
+- The GitHub Actions workflows for this repo, use a reusuable workflow - [serverless-deploy-workflow.yml](https://github.com/KremzeeqOrg/gha-reusable-workflows/blob/main/.github/workflows/serverless-deploy-workflow.yml). This requires environment variables and secrets to be set for 3 different GitHub environments (`dev`, `prod` and `feature`). See 'Variables for Serverless Deploy workflow' [here](https://github.com/KremzeeqOrg/gha-reusable-workflows/tree/main#environment-variables). This should be considered as separate to GitHub secrets.
+
+#### Secrets required per a GitHub environment
 
 <details>
-<summary>Here's secrets required per a GitHub environment</summary>
 
 | Field                     | Explanation                                                                                                                                                                                                                                                                                                                                                                        |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
