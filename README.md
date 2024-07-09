@@ -19,6 +19,8 @@ Python API scraper designed to be deployed as an AWS lambda, to support an ETL w
   - [Running tests](#running-tests)
 - [Appendix](#appendix)
   - [Setting up AWS SSM Parameters for target APIs](#setting-up-aws-ssm-parameters-for-target-apis)
+    - [Understanding fields in SSM parameters](#understanding-fields-in-ssm-parameters)
+    - [Setting up SSM Parameters for the fruit-project](#setting-up-ssm-parameters-for-the-fruit-project)
   - [Working with Custom Field Info for data transformation](#working-with-custom-field-info-for-data-transformation)
   - [Updating API Mapping Config](#updating-api-mapping-config)
   - [Testing Record Retrieval from AWS DynamoDB](#testing-record-retrieval-from-aws-dynamodb)
@@ -69,9 +71,9 @@ src
 ## Orchestration
 
 - When code is merged to the `main` branch, this triggers a GitHub Actions workflow - [serverless-main-workflow.yml](.github/workflows/serverless-main-workflow.yml).
-- Configuration requirements for GitHub Actions are available [here](#github-actions-workflow-configuration)
+- Configuration requirements for GitHub Actions are available [here](#github-actions-workflow-configuration).
 - This executes unit tests, followed by jobs to deploy the app with resources to an AWS `dev` environment, followed by a deployment to an `prod` AWS environment.
-- An approval gate can be setup for the `prod` GitHub environment. Details for setting this up are [here](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#bypassing-environment-protection-rules)
+- An approval gate can be manually setup for the `prod` GitHub environment, where the environment can be setup as a protected environment, needing approvers, prior to a deployment to the environment taking place. Details for setting this up are [here](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#required-reviewers).
 - The workflow employs a reusable [serverless-deploy-workflow](https://github.com/KremzeeqOrg/gha-reusable-workflows/blob/main/.github/workflows/serverless-deploy-workflow.yml) with a Docker tagging strategy to support deploying to different environments for `feature`, `dev` and `prod`.
 - The `serverless.yml` configuration in this repo provides a specification for the app AWS Lambda, where the uri for the docker image in AWS ECR is parameterised, so that it is passed from the GitHub Actions workflow. It also defines the AWS Step Functions state machine, with payloads for chained executions of the app lambda. See more about the Serverless Framework project [here](https://www.serverless.com/framework).
 
@@ -370,10 +372,14 @@ NB. Once the data is uploaded to DynamoDB, the data is automatically tranformed 
 
 ### Updating API Mapping Config
 
+<details>
+
 - This repo is constructed, so minimal configuration for envieonment variables resides within app code.
 
 - In the config file for api_mapping [here](./src/config/api_mapping.py), target apis are listed under `api_groups`. You can see that `api-groups` are mapped to scraping rules. Basically, the `default` app behaviour is to scrape from a single endpoint to fetch all records.
 - However, that might not be possible for all endpoints. If the scraping rule is set to `alphabetical`, the app will loop through each letter of the alphabet and append the scraping rule `query` e.g. `"?f="`, to the api endpoint, followed by each letter. That will form endpoints in turn from which records can be scraped from.
+
+</details>
 
 ### Testing Record Retrieval from AWS DynamoDB
 
