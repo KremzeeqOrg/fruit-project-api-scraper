@@ -1,0 +1,108 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+    secrets:
+      aws-region:
+        required: true
+      aws-iam-role:
+        required: true
+      aws-account-id:
+        required: true
+      dockerhub-username:
+        required: true
+      dockerhub-token:
+        required: true
+      serverless-access-key:
+        required: true
+
+jobs:
+  serverless-deploy:
+    name: "Serverless Deploy for ${{ vars.ENV }}"
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    environment : ${{ inputs.environment }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set AWS context
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.aws-iam-role }}
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ secrets.aws-region }}
+        mask-aws-account-id: true
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
+        mask-password: 'true'
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.dockerhub-username }}
+        password: ${{ secrets.dockerhub-token }}
+    - name: Docker push to AWS ECR
+      id: docker-push
+      env:
+        AWS_ECR_REPO: ${{ secrets.aws-account-id }}.dkr.ecr.${{ secrets.aws-region }}.amazonaws.com
+      run: |
+        app_latest_tag="${{ vars.APP }}:latest"
+        commit_sha_short=$(git rev-parse --short HEAD)
+        commit_tag="${{ vars.APP }}:${{ vars.ENV }}-${commit_sha_short}"
+
+        aws_ecr_commit_uri="${{ env.AWS_ECR_REPO }}/${commit_tag}"
+        aws_ecr_latest_uri="${{ env.AWS_ECR_REPO }}/${app_latest_tag}"
+
+        docker_hub_commit_uri="${{ secrets.dockerhub-username }}/${commit_tag}"
+        docker_hub_latest_uri="${{ secrets.dockerhub-username }}/${app_latest_tag}"
+
+        build_and_push_feature_or_dev() {
+          docker build --platform linux/amd64 -t ${commit_tag} -t ${aws_ecr_commit_uri} .
+          if [ ${{ vars.ENV }} == "feature" ]; then
+            docker push ${aws_ecr_commit_uri}
+          elif [ ${{ vars.ENV }} == "dev" ]; then
+            docker tag ${aws_ecr_commit_uri} ${aws_ecr_latest_uri}
+            docker tag ${aws_ecr_commit_uri} ${docker_hub_commit_uri}
+            docker tag ${aws_ecr_commit_uri} ${docker_hub_latest_uri}
+
+            docker push ${aws_ecr_commit_uri}
+            docker push ${aws_ecr_latest_uri}
+            docker push ${docker_hub_commit_uri}
+            docker push ${docker_hub_latest_uri}
+          fi
+        }
+
+        push_prod() {
+          docker_hub_latest_uri="${{ secrets.dockerhub-username }}/${{ vars.APP }}:dev-${commit_sha_short}"
+          docker pull ${docker_hub_latest_uri}
+          if [ $? -ne 0 ]; then
+            echo "Docker pull failed. Image not found: ${docker_hub_latest_uri}"
+            exit 1
+          fi
+          docker tag ${docker_hub_latest_uri} ${aws_ecr_commit_uri}
+          docker tag ${aws_ecr_commit_uri} ${aws_ecr_latest_uri}
+          docker push ${aws_ecr_commit_uri}
+          docker push ${aws_ecr_latest_uri}
+        }
+
+        if [ ${{ vars.ENV }} == "feature" ] || [ ${{ vars.ENV }} == "dev" ]; then
+          build_and_push_feature_or_dev
+        elif [ ${{ vars.ENV }} == "prod" ]; then
+          push_prod
+        fi
+        echo "image_uri=${aws_ecr_commit_uri}" >> "$GITHUB_OUTPUT"
+    - name: Use Node.js ${{ vars.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ vars.NODE_VERSION }}
+    - name: serverless deploy
+      run: | 
+        npm i -g serverless@${{ vars.SERVERLESS_VERSION }}
+        npm install && npm list -g
+        image_uri="imageURI=${{ steps.docker-push.outputs.image_uri }}"
+        serverless deploy --stage ${{ vars.ENV }} --param=${image_uri}
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.serverless-access-key }}

@@ -53,7 +53,7 @@ jobs:
       id-token: write
       contents: read
     if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
-    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml@main
+    uses: ./.github/workflows/serverless-deploy-workflow.yml@main
     with:
       environment: feature
     secrets: 
