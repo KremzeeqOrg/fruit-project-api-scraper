@@ -9,21 +9,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # pytest:
-  #   name: Pytest
-  #   permissions:
-  #     contents: read
-  #   strategy:  
-  #     matrix:  
-  #       test_file: ${{ fromJson('["api_mapping_manager", "record_manager", "scraper", "utils"]') }}
-  #   uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-unit-test-workflow.yml@main
-  #   with:
-  #     environment: feature
-  #     test_file: ${{ matrix.test_file }}
+  pytest:
+    name: Pytest
+    permissions:
+      contents: read
+    strategy:  
+      matrix:  
+        test_file: ${{ fromJson('["api_mapping_manager", "record_manager", "scraper", "utils"]') }}
+    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/pytest-unit-test-workflow.yml@main
+    with:
+      environment: feature
+      test_file: ${{ matrix.test_file }}
 
   label-check:
     name: "Check Deploy Label"
-    # needs: [pytest]
+    needs: [pytest]
     runs-on: ubuntu-latest
     outputs:
       can_deploy: ${{ steps.set_output.outputs.can_deploy }}
@@ -46,16 +46,16 @@ jobs:
             echo "can_deploy=false" >> "$GITHUB_OUTPUT"
           fi
       
-  serverless-deploy-dev:
+  serverless-deploy:
     name: Serverless Deploy
     needs: [ label-check ]
     permissions:
       id-token: write
       contents: read
     if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
-    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml@feature/improved-docker-image-tagging-strategy
+    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml@main
     with:
-      environment: dev
+      environment: feature
     secrets: 
       aws-region: ${{ secrets.AWS_REGION }}
       aws-iam-role: ${{ secrets.AWS_ACCOUNT_ACCESS_ROLE }}
@@ -63,21 +63,3 @@ jobs:
       dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
       dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
       serverless-access-key: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-
-  serverless-deploy-prod:
-      name: Serverless Deploy
-      needs: [ label-check, serverless-deploy-dev ]
-      permissions:
-        id-token: write
-        contents: read
-      if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
-      uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml@feature/improved-docker-image-tagging-strategy
-      with:
-        environment: prod
-      secrets: 
-        aws-region: ${{ secrets.AWS_REGION }}
-        aws-iam-role: ${{ secrets.AWS_ACCOUNT_ACCESS_ROLE }}
-        aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
-        dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
-        dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
-        serverless-access-key: ${{ secrets.SERVERLESS_ACCESS_KEY }}
