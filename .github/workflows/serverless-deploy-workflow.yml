@@ -60,7 +60,7 @@ jobs:
         docker_hub_latest_uri="${{ secrets.dockerhub-username }}/${app_latest_tag}"
 
         build_and_push_feature_or_dev() {
-          docker build --platform linux/amd64 -t ${commit_tag} -t ${aws_ecr_commit_uri} .
+          docker build --platform linux/amd64 -t ${commit_tag} -t ${aws_ecr_commit_uri} --cache-from ${aws_ecr_latest_uri} .
           if [ ${{ vars.ENV }} == "feature" ]; then
             docker push ${aws_ecr_commit_uri}
           elif [ ${{ vars.ENV }} == "dev" ]; then
