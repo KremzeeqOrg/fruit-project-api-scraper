@@ -101,7 +101,7 @@ See [Setting up AWS SSM Parameters for target APIs](#setting-up-aws-ssm-paramete
 - When you raise a PR against the `main` branch, tag it with a `deploy` label to test out a docker build and deployment to the GitHub `feature` environment. This will provision resources as per the `serverless.yml` file and the resources will include:
 
 - Lambda: `fruit-project-api-scraper-feature`
-- AWS Step Functiosn state machine: `fruit-project-api-scraper-state-machine-feature`.
+- AWS Step Functions state machine: `fruit-project-api-scraper-state-machine-feature`.
 
 The related workflow is [here](./.github/workflows/serverless-feature-workflow.yml)
 
