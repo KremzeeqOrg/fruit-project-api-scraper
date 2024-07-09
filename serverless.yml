@@ -51,7 +51,7 @@ functions:
   app:
     name: ${param:functionName}
     image:
-      uri: ${param:image_uri}
+      uri: ${param:imageURI}
 
 stepFunctions:
   stateMachines:

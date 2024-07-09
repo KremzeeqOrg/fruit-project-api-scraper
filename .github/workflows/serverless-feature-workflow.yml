@@ -53,7 +53,7 @@ jobs:
       id-token: write
       contents: read
     if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
-    uses: ./.github/workflows/serverless-deploy-workflow.yml
+    uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml@feature/improved-docker-image-tagging-strategy
     with:
       environment: dev
     secrets: 
@@ -71,7 +71,7 @@ jobs:
         id-token: write
         contents: read
       if: ${{ needs.label-check.outputs.can_deploy == 'true' }}
-      uses: ./.github/workflows/serverless-deploy-workflow.yml
+      uses: KremzeeqOrg/gha-reusable-workflows/.github/workflows/serverless-deploy-workflow.yml@feature/improved-docker-image-tagging-strategy
       with:
         environment: prod
       secrets: 
