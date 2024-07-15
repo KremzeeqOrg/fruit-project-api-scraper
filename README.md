@@ -34,8 +34,8 @@ At runtime, the scraper application looks up an AWS SSM parameter based on these
 - `app`: Application name e.g. `fruit-project-api-scraper`
 - `sourceApiName`: The name of the target API you would like to scrape.
 
-- Once the SSM parameter is fetched by the application, it scrapes api records from an external target API.
-- It then transforms the api records so that only required fields defined in the fetched parameter are kept and a timestamp is added to each record.
+- Once the SSM parameter is fetched by the application, it scrapes API records from an external target API.
+- It then transforms the API records so that only required fields defined in the fetched parameter are kept and a timestamp is added to each record.
 - All records are uploaded in batches to a target table in DynamoDB.
 
 The timestamp is added for each record, to help with traceability in terms of understanding when records were last updated in DynamoDB.
@@ -47,7 +47,7 @@ Whilst the app has been created for a `fruit-project`, configuration can be easi
 <summary>Overview on Configuation</summary>
 
 - When you setup your SSM parameter, the parameter name should have the format: `${app}--{sourceApiScraper}-config`.
-- The parameter provides environment variables in a json to be fetched during runtime. See [here](#setting-up-aws-ssm-parameter-for-target-api)
+- The parameter provides environment variables in a json to be fetched during runtime. See [Setting up AWS SSM Parameters for target APIs](#setting-up-aws-ssm-parameters-for-target-apis) for examples of SSM parameters that can be used for thsi project.
 - There is also [additional API mapping configuration](#updating-api-mapping-config) in app code which can be updated to define scraping rules for target APIs.
 
 </details>
@@ -73,9 +73,9 @@ src
 <details>
 
 - If you are proceeding to use the entire solution for the `fruit-project`, ensure to provision foundational resources from [fruit-project-infra](https://github.com/KremzeeqOrg/fruit-project-infra)
-- This includes ensuring an AWS ECR repository is provisioned as well as DynamoDB tables, where transformed scraped api records can be pushed to.
-- The `fruit-project-infra` project details some [Bootstrap steps](https://github.com/KremzeeqOrg/fruit-project-infra#bootstrap) whereby AWS IAM roles need to be set-up in AWS in two target environments for `dev` and `prod` and resources are provisioned via Terraform jobs in GitHub Action workflows.
-- These same AWS IAM roles can potentially be used for roles referenced in GitHub Action workflows used by this repo. See [GitHub Actions Workflow Configuration](#github-actions-workflow-configuration) for more about setting up environment variables an secrets.
+- This includes ensuring an AWS ECR repository is provisioned as well as DynamoDB tables, which scraped and transformed api records can be pushed to.
+- The `fruit-project-infra` project details some [Bootstrap steps](https://github.com/KremzeeqOrg/fruit-project-infra#bootstrap) whereby AWS IAM roles need to be set-up in two target AWS environments for `dev` and `prod`. The project entails provisioning resources via Terraform jobs in GitHub Action workflows.
+- These same AWS IAM roles can potentially be used for roles referenced in GitHub Action workflows used by this repo. See [GitHub Actions Workflow Configuration](#github-actions-workflow-configuration) for more about setting up environment variables and secrets.
 
 </details>
 
@@ -83,12 +83,12 @@ src
 
 <details>
 
-- When code is merged to the `main` branch, this triggers a GitHub Actions workflow - [serverless-main-workflow.yml](.github/workflows/serverless-main-workflow.yml).
+- When code in this repo is merged to the `main` branch, this triggers a GitHub Actions workflow - [serverless-main-workflow.yml](.github/workflows/serverless-main-workflow.yml).
 - Configuration requirements for GitHub Actions are available [here](#github-actions-workflow-configuration).
-- This executes unit tests, followed by jobs to deploy the app with resources to an AWS `dev` environment, followed by a deployment to an `prod` AWS environment.
-- An approval gate can be manually setup for the `prod` GitHub environment, where the environment can be setup as a protected environment, needing approvers, prior to a deployment to the environment taking place. Details for setting this up are [here](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#required-reviewers).
+- This executes unit tests, followed by jobs to deploy the app with resources to an AWS `dev` environment, followed by a deployment to a `prod` AWS environment.
+- An approval gate can be manually setup for the `prod` GitHub environment, where the environment can be setup as a protected environment, needing approvers, prior to a deployment to the target environment taking place. Details for setting this up are [here](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#required-reviewers).
 - The workflow employs a reusable [serverless-deploy-workflow](https://github.com/KremzeeqOrg/gha-reusable-workflows/blob/main/.github/workflows/serverless-deploy-workflow.yml) with a Docker tagging strategy to support deploying to different environments for `feature`, `dev` and `prod`.
-- The `serverless.yml` configuration in this repo provides a specification for the app AWS Lambda, where the uri for the docker image in AWS ECR is parameterised, so that it is passed from the GitHub Actions workflow. It also defines the AWS Step Functions state machine, with payloads for chained executions of the app lambda. See more about the Serverless Framework project [here](https://www.serverless.com/framework).
+- The `serverless.yml` configuration in this repo provides a specification for the app AWS Lambda, where the uri for the docker image in a AWS ECR repository is parameterised, so that it is passed from the GitHub Actions workflow. It also defines the AWS Step Functions state machine, with payloads for chained executions of the app AWS Lambda. See more about the Serverless Framework project [here](https://www.serverless.com/framework).
 
 In AWS you can execute the AWS Lambda (e.g. `fruit-project-api-scraper-<env>`), directly, with a payload e.g. :
 
@@ -97,7 +97,7 @@ In AWS you can execute the AWS Lambda (e.g. `fruit-project-api-scraper-<env>`), 
 "sourceApiName": "fruity-vice"}
 ```
 
-You can also execute the AWS Step Functions state machine - `fruit-project-api-scraper-state-machine-<env>`. This which entails 3 successive executions of the scraper application in relation to 3 target APIs for the project, where payloads are preset fo the following:
+You can also execute the AWS Step Functions state machine - `fruit-project-api-scraper-state-machine-<env>`. This entails 3 successive executions of the scraper application in relation to 3 target APIs for the project, where payloads are preset fo the following:
 
 - [fruity-vice](https://www.fruityvice.com/)
 - [the-cocktail-db](https://www.thecocktaildb.com/)
@@ -120,9 +120,9 @@ See [Setting up AWS SSM Parameters for target APIs](#setting-up-aws-ssm-paramete
 
 The related workflow is [here](./.github/workflows/serverless-feature-workflow.yml)
 
-- When PRs are closed, a [teardown workflow](./.github/workflows/serverless-feature-teardown.yml) is triggered to destroy the cloudformation stack provisioned for the `feature` environment.
-- The `fruit-project` relies on `feature` deployments being provisioned to the same AWS environment as the `dev` AWS account.
-- The lambda and state machine for the `feature` deployment will push api records to the same DynamoDB tables as the `dev` environment.
+- When PRs are closed, a [teardown workflow](./.github/workflows/serverless-feature-teardown.yml) is triggered to destroy the AWS CloudFormation stack provisioned for the `feature` environment.
+- The `fruit-project` relies on `feature` deployments being provisioned to the same AWS environment as the `dev` AWS account. Thus, the GitHub environment secrets set for the environment will need to reflect that.
+- The lambda and state machine for the `feature` deployment pushes API records to the same DynamoDB tables as the `dev` environment. It also fetches the same SSM parameters used in the `dev` environment.
 
 </details>
 
@@ -155,7 +155,7 @@ The related workflow is [here](./.github/workflows/serverless-feature-workflow.y
 | `AWS_ACCOUNT_ID`          | ID for target AWS account.                                                                                                                                                                                                                                                                                                                                                                       |
 | `AWS_GITHUB_ACTIONS_ROLE` | This is the name of the AWS IAM role with a trust policy, which enables GitHub as a OIDC provider to assume the role with certain permissions. A policy should also be attached to the role, applying the 'principle of least privilege'. Please consult this [AWS blog](https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/) for further guidance. |
 | `DOCKERHUB_TOKEN`         | Docker Hub token can be created. [Details here](https://docs.docker.com/security/for-developers/access-tokens/)                                                                                                                                                                                                                                                                                  |
-| `SERVERLESS_ACCESS_KEY`   | Serverless Access Key can be created on the [serverless](https://www.serverless.com/framework) website when you log in and navigate to settings                                                                                                                                                                                                                                                  |
+| `SERVERLESS_ACCESS_KEY`   | Serverless Access Key can be created on the [serverless](https://www.serverless.com/framework) website when you log in and navigate to settings.                                                                                                                                                                                                                                                 |
 
 </details>
 
@@ -183,6 +183,13 @@ event = {"app": "fruit-project-api-scraper",
          "sourceApiName": "fruity-vice"}
 ```
 
+Also, check the event can be excepted in teh following clause:
+
+```
+if __name__ == '__main__':
+  main(event, '')
+```
+
 5. Execute the handler: `python ./src/handler.py`. With the SSM parameter and payload setup for `fruity-vice`, as a target API, this will transform and update records in the provisioned `fruit` table in AWS DynamoDB.
 
 </details>
@@ -197,7 +204,7 @@ With your virtual environment activated, run:
 
 2. `pytest -vv ./src/tests/`
 
-Note: Tests are run, with imports from [helper files](./src/helper_files/). This contains samples for AWS Parameter Store parameters and also for fetched sample_api records from target APIs.
+Note: Tests are run, with imports from [helper files](./src/helper_files/). This contains samples for AWS Parameter Store parameters and also for fetched sample records from target APIs.
 
 </details>
 
@@ -226,7 +233,7 @@ A single SSM Parameter can be populated with a JSON, with configuration related 
 
 #### Setting up SSM Parameters for the fruit-project
 
-Here, json samples are provided for example SSM parameters used for this project. Based on this information, you can conceptualise your own SSM parameters for other tergt APIs you may use the web scraper for.
+Here, json samples are provided for example SSM parameters used for this project which you can setup in your . Based on this information, you can conceptualise your own SSM parameters for other tergt APIs you may use the web scraper for.
 
 <details>
 <summary>SSM Parameter: fruit-project-api-scraper--fruity-vice-config</summary>
@@ -411,9 +418,9 @@ NB. Once the data is uploaded to DynamoDB, the data is automatically tranformed 
 
 <details>
 
-- This repo is constructed, so minimal configuration for environment variables resides within app code. However, note that this need is balanced for the need of a degree of validation for information which is processed by the application.
+- This repo is constructed, so minimal configuration for environment variables resides within app code. However, note that this is balanced with a need for a degree of validation for information which is processed by the application.
 
-- In the config file for api_mapping [here](./src/config/api_mapping.py), target apis are listed under `api_groups`. You can see that `api-groups` are mapped to scraping rules. Basically, the `default` app behaviour is to scrape from a single endpoint to fetch all records.
+- In the config file for `api_mapping` [here](./src/config/api_mapping.py), target apis are listed under `api_groups`. You can see that `api-groups` are mapped to scraping rules. Basically, the `default` app behaviour is to scrape from a single endpoint to fetch all records.
 - However, that might not be possible for all endpoints. If the scraping rule is set to `alphabetical`, the app will loop through each letter of the alphabet and append the scraping rule `query` e.g. `"?f="`, to the api endpoint, followed by each letter. That will form endpoints in turn from which records can be scraped from.
 
 </details>

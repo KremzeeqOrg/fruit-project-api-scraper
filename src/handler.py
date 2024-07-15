@@ -12,4 +12,6 @@ def main(event, context):
     orchestrator.execute()
 
 if __name__ == '__main__':
+  # uncomment to test event payload locally
+  # main(event, '')
   main('', '')
