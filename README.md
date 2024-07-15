@@ -421,7 +421,7 @@ NB. Once the data is uploaded to DynamoDB, the data is automatically tranformed 
 - This repo is constructed, so minimal configuration for environment variables resides within app code. However, note that this is balanced with a need for a degree of validation for information which is processed by the application.
 
 - In the config file for `api_mapping` [here](./src/config/api_mapping.py), target APIs are listed under `api_groups`. You can see that `api_groups` are mapped to scraping rules. Basically, the `default` app behaviour is to scrape from a single endpoint to fetch all records.
-- However, that might not be possible for all endpoints. If the scraping rule is set to `alphabetical`, the app will loop through each letter of the alphabet and append the scraping rule `query` e.g. `"?f="`, to the api endpoint, followed by each letter. That will form endpoints in turn from which records can be scraped from.
+- However, that might not be possible for all endpoints. If the scraping rule is set to `alphabetical`, the app will loop through each letter of the alphabet and append the scraping rule `query` e.g. `"?f="`, to the API endpoint, followed by each letter. That will form endpoints in turn from which records can be scraped from.
 
 </details>
 
