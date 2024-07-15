@@ -183,7 +183,7 @@ event = {"app": "fruit-project-api-scraper",
          "sourceApiName": "fruity-vice"}
 ```
 
-Also, check the event can be excepted in teh following clause:
+Also, check the event can be excepted in the following clause:
 
 ```
 if __name__ == '__main__':
