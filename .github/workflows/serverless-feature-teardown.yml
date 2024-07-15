@@ -4,6 +4,9 @@ on:
       - main
     types: [closed]
 
+concurrency:
+  group: feature
+
 env:
   APP: fruit-project-api-scraper
   ENV: feature
