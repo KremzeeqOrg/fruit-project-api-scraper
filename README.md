@@ -113,9 +113,11 @@ The related workflow is [here](./.github/workflows/serverless-feature-workflow.y
 
 ### GitHub Actions Workflow Configuration
 
-- The GitHub Actions workflows for this repo, use a reusuable workflow - [serverless-deploy-workflow.yml](https://github.com/KremzeeqOrg/gha-reusable-workflows/blob/main/.github/workflows/serverless-deploy-workflow.yml). This requires environment variables and secrets to be set for 3 different GitHub environments (`dev`, `prod` and `feature`).
+- The GitHub Actions workflows for this repo, use reusuable workflows from - [https://github.com/KremzeeqOrg/gha-reusable-workflows](https://github.com/KremzeeqOrg/gha-reusable-workflows). The Pytest and Serverless deploy workflows require environment variables and secrets to be set for 3 different GitHub environments; (`dev`, `prod` and `feature`).
 
 #### Environment variables required pr a GitHub environment
+
+<details>
 
 | Field                | Explanation                                                       |
 | -------------------- | ----------------------------------------------------------------- |
@@ -125,6 +127,8 @@ The related workflow is [here](./.github/workflows/serverless-feature-workflow.y
 | `SERVERLESS_VERSION` | e.g. Serverless framework version e.g. > 3.38.0                   |
 | `PYTHON_VERSION`     | e.g. 3.11                                                         |
 | `PYTEST_TEST_DIR`    | `src/tests`                                                       |
+
+</details>
 
 #### Secrets required per a GitHub environment
 
@@ -147,7 +151,7 @@ The related workflow is [here](./.github/workflows/serverless-feature-workflow.y
 - Python: 3.11
 
 - If you are proceeding to use the entire solution for the `fruit-project`, ensure to provision foundational resources from [fruit-project-infra](https://github.com/KremzeeqOrg/fruit-project-infra)
-- This includes ensuring a AWS ECR is provisioned as well as a DynamoDB tables, where transformed scraped api records can be pushed to.
+- This includes ensuring an AWS ECR repository is provisioned as well as a DynamoDB tables, where transformed scraped api records can be pushed to.
 - Ensure you have a CLI tool installed like `aws-vault` to work with the context for your target AWS account.
 
 ### Steps
