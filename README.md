@@ -11,10 +11,10 @@ Python API scraper designed to be deployed as an AWS lambda, to support an ETL w
 
 - [App Overview](#app-overview)
 - [Summary of App modules](#summary-of-app-modules)
+- [Prerequisites](#prerequisites)
 - [Orchestration](#orchestration)
   - [GitHub Actions Workflow Configuration](#github-actions-workflow-configuration)
 - [Running code locally](#running-code-locally)
-  - [Prerequisites](#prerequisites)
   - [Steps](#steps)
   - [Running tests](#running-tests)
 - [Appendix](#appendix)
@@ -68,7 +68,20 @@ src
             └── validator.py            - Validates information. Mainly used within the scraper module
 ```
 
+## Prerequisites
+
+<details>
+
+- If you are proceeding to use the entire solution for the `fruit-project`, ensure to provision foundational resources from [fruit-project-infra](https://github.com/KremzeeqOrg/fruit-project-infra)
+- This includes ensuring an AWS ECR repository is provisioned as well as DynamoDB tables, where transformed scraped api records can be pushed to.
+- The `fruit-project-infra` project details some [Bootstrap steps](https://github.com/KremzeeqOrg/fruit-project-infra#bootstrap) whereby AWS IAM roles need to be set-up in AWS in two target environments for `dev` and `prod` and resources are provisioned via Terraform jobs in GitHub Action workflows.
+- These same AWS IAM roles can potentially be used for roles referenced in GitHub Action workflows used by this repo. See [GitHub Actions Workflow Configuration](#github-actions-workflow-configuration) for more about setting up environment variables an secrets.
+
+</details>
+
 ## Orchestration
+
+<details>
 
 - When code is merged to the `main` branch, this triggers a GitHub Actions workflow - [serverless-main-workflow.yml](.github/workflows/serverless-main-workflow.yml).
 - Configuration requirements for GitHub Actions are available [here](#github-actions-workflow-configuration).
@@ -93,6 +106,8 @@ You can also execute the AWS Step Functions state machine - `fruit-project-api-s
 See [Setting up AWS SSM Parameters for target APIs](#setting-up-aws-ssm-parameter-for-target-api) to learn more about configuration for these which would be fetched at runtime.
 
 **IMPORTANT**: Please consult the API websites should you wish to work with these APIs. These APIs are free to use and present terms of use. The latter 2 work with API keys and a developer test key is provided within endpoints in the example SSM parameters provided on this page (to help with getting started with this project).
+
+</details>
 
 ### Support for Ephemeral Environments
 
@@ -134,33 +149,32 @@ The related workflow is [here](./.github/workflows/serverless-feature-workflow.y
 
 <details>
 
-| Field                     | Explanation                                                                                                                                                                                                                                                                                                                                                                        |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AWS_REGION`              | Target AWS region e.g `eu-west-2`                                                                                                                                                                                                                                                                                                                                                  |
-| `AWS_ACCOUNT_ID`          | ID for target AWS account.                                                                                                                                                                                                                                                                                                                                                         |
-| `AWS_GITHUB_ACTIONS_ROLE` | This is a AWS IAM role with a trust policy, which enables GitHub as a OIDC provider to assume the role with certain permissions. A policy should also be attached to the role, applying the 'principle of least privilege'. Please consult this [AWS blog](https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/) for further guidance. |
-| `DOCKERHUB_TOKEN`         | Docker Hub token can be created. [Details here](https://docs.docker.com/security/for-developers/access-tokens/)                                                                                                                                                                                                                                                                    |
-| `SERVERLESS_ACCESS_KEY`   | Serverless Access Key can be created on the [serverless](https://www.serverless.com/framework) website when you log in and navigate to settings                                                                                                                                                                                                                                    |
+| Field                     | Explanation                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `AWS_REGION`              | Target AWS region e.g `eu-west-2`                                                                                                                                                                                                                                                                                                                                                                |
+| `AWS_ACCOUNT_ID`          | ID for target AWS account.                                                                                                                                                                                                                                                                                                                                                                       |
+| `AWS_GITHUB_ACTIONS_ROLE` | This is the name of the AWS IAM role with a trust policy, which enables GitHub as a OIDC provider to assume the role with certain permissions. A policy should also be attached to the role, applying the 'principle of least privilege'. Please consult this [AWS blog](https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/) for further guidance. |
+| `DOCKERHUB_TOKEN`         | Docker Hub token can be created. [Details here](https://docs.docker.com/security/for-developers/access-tokens/)                                                                                                                                                                                                                                                                                  |
+| `SERVERLESS_ACCESS_KEY`   | Serverless Access Key can be created on the [serverless](https://www.serverless.com/framework) website when you log in and navigate to settings                                                                                                                                                                                                                                                  |
 
 </details>
 
 ## Running code locally
 
-### Prerequisites
+- Use Python: 3.11
 
-- Python: 3.11
-
-- If you are proceeding to use the entire solution for the `fruit-project`, ensure to provision foundational resources from [fruit-project-infra](https://github.com/KremzeeqOrg/fruit-project-infra)
-- This includes ensuring an AWS ECR repository is provisioned as well as a DynamoDB tables, where transformed scraped api records can be pushed to.
+- See [prerequisites](#prerequisites) related to provisioning resources from the [fruit-project-infra](https://github.com/KremzeeqOrg/fruit-project-infra project).
 - Ensure you have a CLI tool installed like `aws-vault` to work with the context for your target AWS account.
 
 ### Steps
 
-1. In AWS, setup AWS SSM Parameter with config for scraping a target API. Also, setup any target AWS DynamoDB tables, with a specification for the hash key. Please see [here](#Setting up AWS SSM Parameters for target APIs) for more info on this.
+<details>
+
+1. In each target AWS account (for `dev` and `prod`), setup AWS SSM Parameters with config for scraping target APIs. See [Setting up AWS SSM Parameters for target APIs](#setting-up-aws-parameters-for-target-apis) for more info on this.
 
 2. Review the API Mapping Config [here](#updating-api-mapping-config). If the `api_name` is not listed for your target API, you will need to update this config.
 
-3. Setup and activate a virtual Python environment and run `pip install -r requirements.txt` in the `src` directory
+3. Setup and activate a virtual Python environment and run `pip install -r requirements.txt`, in the directory above the `src` directory.
 
 4. In the app [handler](./src/handler.py), uncomment the event and update the event dictionary with desired values. This simulates the payload which would otherwise be sent to the lambda in AWS. Here's an example of the payload:
 
@@ -169,9 +183,13 @@ event = {"app": "fruit-project-api-scraper",
          "sourceApiName": "fruity-vice"}
 ```
 
-5. Execute the handler: `python ./src/handler.py`
+5. Execute the handler: `python ./src/handler.py`. With the SSM parameter and payload setup for `fruity-vice`, as a target API, this will transform and update records in the provisioned `fruit` table in AWS DynamoDB.
+
+</details>
 
 ### Running tests
+
+<details>
 
 With your virtual environment activated, run:
 
@@ -180,6 +198,8 @@ With your virtual environment activated, run:
 2. `pytest -vv ./src/tests/`
 
 Note: Tests are run, with imports from [helper files](./src/helper_files/). This contains samples for AWS Parameter Store parameters and also for fetched sample_api records from target APIs.
+
+</details>
 
 ## Appendix
 
@@ -205,6 +225,8 @@ A single SSM Parameter can be populated with a JSON, with configuration related 
 </details>
 
 #### Setting up SSM Parameters for the fruit-project
+
+Here, json samples are provided for example SSM parameters used for this project. Based on this information, you can conceptualise your own SSM parameters for other tergt APIs you may use the web scraper for.
 
 <details>
 <summary>SSM Parameter: fruit-project-api-scraper--fruity-vice-config</summary>
@@ -389,7 +411,7 @@ NB. Once the data is uploaded to DynamoDB, the data is automatically tranformed 
 
 <details>
 
-- This repo is constructed, so minimal configuration for envieonment variables resides within app code.
+- This repo is constructed, so minimal configuration for environment variables resides within app code. However, note that this need is balanced for the need of a degree of validation for information which is processed by the application.
 
 - In the config file for api_mapping [here](./src/config/api_mapping.py), target apis are listed under `api_groups`. You can see that `api-groups` are mapped to scraping rules. Basically, the `default` app behaviour is to scrape from a single endpoint to fetch all records.
 - However, that might not be possible for all endpoints. If the scraping rule is set to `alphabetical`, the app will loop through each letter of the alphabet and append the scraping rule `query` e.g. `"?f="`, to the api endpoint, followed by each letter. That will form endpoints in turn from which records can be scraped from.
