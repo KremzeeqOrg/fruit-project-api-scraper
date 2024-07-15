@@ -85,10 +85,10 @@ src
 
 - When code in this repo is merged to the `main` branch, this triggers a GitHub Actions workflow - [serverless-main-workflow.yml](.github/workflows/serverless-main-workflow.yml).
 - Configuration requirements for GitHub Actions are available [here](#github-actions-workflow-configuration).
-- This executes unit tests, followed by jobs to deploy the app with resources to an AWS `dev` environment, followed by a deployment to a `prod` AWS environment.
+- This executes unit tests, followed by jobs to deploy the app with resources to an AWS `dev` environment, followed by a deployment to an AWS `prod` environment.
 - An approval gate can be manually setup for the `prod` GitHub environment, where the environment can be setup as a protected environment, needing approvers, prior to a deployment to the target environment taking place. Details for setting this up are [here](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#required-reviewers).
 - The workflow employs a reusable [serverless-deploy-workflow](https://github.com/KremzeeqOrg/gha-reusable-workflows/blob/main/.github/workflows/serverless-deploy-workflow.yml) with a Docker tagging strategy to support deploying to different environments for `feature`, `dev` and `prod`.
-- The `serverless.yml` configuration in this repo provides a specification for the app AWS Lambda, where the uri for the docker image in a AWS ECR repository is parameterised, so that it is passed from the GitHub Actions workflow. It also defines the AWS Step Functions state machine, with payloads for chained executions of the app AWS Lambda. See more about the Serverless Framework project [here](https://www.serverless.com/framework).
+- The `serverless.yml` configuration in this repo provides a specification for the app AWS Lambda, where the uri for the docker image in an AWS ECR repository is parameterised, so that it is passed from the GitHub Actions workflow Serverless deploy job. It also defines the AWS Step Functions state machine, with payloads for chained executions of the app AWS Lambda. See more about the Serverless Framework project [here](https://www.serverless.com/framework).
 
 In AWS you can execute the AWS Lambda (e.g. `fruit-project-api-scraper-<env>`), directly, with a payload e.g. :
 
@@ -121,7 +121,7 @@ See [Setting up AWS SSM Parameters for target APIs](#setting-up-aws-ssm-paramete
 The related workflow is [here](./.github/workflows/serverless-feature-workflow.yml)
 
 - When PRs are closed, a [teardown workflow](./.github/workflows/serverless-feature-teardown.yml) is triggered to destroy the AWS CloudFormation stack provisioned for the `feature` environment.
-- The `fruit-project` relies on `feature` deployments being provisioned to the same AWS environment as the `dev` AWS account. Thus, the GitHub environment secrets set for the environment will need to reflect that.
+- The `fruit-project` relies on `feature` deployments being provisioned to the same AWS environment as the AWS `dev` account. Thus, the GitHub environment secrets set for the environment will need to reflect that.
 - The lambda and state machine for the `feature` deployment pushes API records to the same DynamoDB tables as the `dev` environment. It also fetches the same SSM parameters used in the `dev` environment.
 
 </details>
