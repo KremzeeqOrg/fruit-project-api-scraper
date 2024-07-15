@@ -113,7 +113,18 @@ The related workflow is [here](./.github/workflows/serverless-feature-workflow.y
 
 ### GitHub Actions Workflow Configuration
 
-- The GitHub Actions workflows for this repo, use a reusuable workflow - [serverless-deploy-workflow.yml](https://github.com/KremzeeqOrg/gha-reusable-workflows/blob/main/.github/workflows/serverless-deploy-workflow.yml). This requires environment variables and secrets to be set for 3 different GitHub environments (`dev`, `prod` and `feature`). See 'Variables for Serverless Deploy workflow' [here](https://github.com/KremzeeqOrg/gha-reusable-workflows/tree/main#environment-variables). This should be considered as separate to GitHub secrets.
+- The GitHub Actions workflows for this repo, use a reusuable workflow - [serverless-deploy-workflow.yml](https://github.com/KremzeeqOrg/gha-reusable-workflows/blob/main/.github/workflows/serverless-deploy-workflow.yml). This requires environment variables and secrets to be set for 3 different GitHub environments (`dev`, `prod` and `feature`).
+
+#### Environment variables required pr a GitHub environment
+
+| Field                | Explanation                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| `APP`                | App name. AWS ECR and Docker Hub repos should have the same name. |
+| `ENV`                | e.g. `feature` / `dev` / `prod`                                   |
+| `NODE_VERSION`       | Node version. e.g. 20                                             |
+| `SERVERLESS_VERSION` | e.g. Serverless framework version e.g. > 3.38.0                   |
+| `PYTHON_VERSION`     | e.g. 3.11                                                         |
+| `PYTEST_TEST_DIR`    | `src/tests`                                                       |
 
 #### Secrets required per a GitHub environment
 
