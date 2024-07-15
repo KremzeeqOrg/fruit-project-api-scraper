@@ -47,7 +47,7 @@ Whilst the app has been created for a `fruit-project`, configuration can be easi
 <summary>Overview on Configuation</summary>
 
 - When you setup your SSM parameter, the parameter name should have the format: `${app}--{sourceApiScraper}-config`.
-- The parameter provides environment variables in a json to be fetched during runtime. See [Setting up AWS SSM Parameters for target APIs](#setting-up-aws-ssm-parameters-for-target-apis) for examples of SSM parameters that can be used for thsi project.
+- The parameter provides environment variables in a json to be fetched during runtime. See [Setting up AWS SSM Parameters for target APIs](#setting-up-aws-ssm-parameters-for-target-apis) for examples of SSM parameters that can be used for this project.
 - There is also [additional API mapping configuration](#updating-api-mapping-config) in app code which can be updated to define scraping rules for target APIs.
 
 </details>
@@ -395,15 +395,15 @@ Here, json samples are provided for example SSM parameters used for this project
 
 As an example, you can see `"custom_field_info" : {"ingredient_max_count" : 20}` is set for the example SSM parameter for `fruit-project-api-scraper--the-meal-db-config`.
 
-Basically, in the [record_manager](./src/modules/record_manager.py) module, there is function - `transform_data_for_upload`. Within that, there is a clause to check if `ingredient_max_count` is nested under `custom_field_info"`. If it is present, the function `prepare_ingredients_doc` is executed for each record related to a recipe. The `ingredient_max_count` represents the number of iterations needed to search through all the ingredient and measure keys as per the SSM parameter `field_mapping` to construct a new field for `ingredients` with both ingredients and measures. Prior to uploading to DynamoDB, the ingredients field e.g. for `Vegetarian Chilli`, would look like this:
+Basically, in the [record_manager](./src/modules/record_manager.py) module, there is a function - `transform_data_for_upload`. Within that, there is a clause to check if `ingredient_max_count` is nested under `custom_field_info"`. If it is present, the function `prepare_ingredients_doc` is executed for each record related to a recipe. The `ingredient_max_count` represents the number of iterations needed to search through all the ingredient and measure keys as per the SSM parameter `field_mapping` to construct a new field for `ingredients` with both ingredients and measures. Prior to uploading to DynamoDB, the ingredients field e.g. for `Vegetarian Chilli`, would look like this:
 
 ```
 [ { "measure_1" : "400g" , "ingredient_1" : "Roasted Vegetables" }, {"measure_2" : "1 can ", "ingredient_2" : "Kidney Beans" }, { "ingredient_3" : "Chopped Tomatoes", "measure_3" : "1 can " },   {"measure_4" : "1 Packet", "ingredient_4" : "Mixed Grain" } ]
 ```
 
-This is as opposed to having 20 fields respectively for measures and ingredients e.g. `measure_1`, `ingredient_1`, `measure_2`, `ingredient_2` etc. The same transformative logic is applied for `the-cocktail-db`.
+This is as opposed to having to keep 20 DynamoDB fields respectively for measures and ingredients e.g. `measure_1`, `ingredient_1`, `measure_2`, `ingredient_2` etc. The same transformative logic is applied for `the-cocktail-db`.
 
-NB. Once the data is uploaded to DynamoDB, the data is automatically tranformed by DynamoDB with a tagging stratgey so it can manage and index data efficiently. The data will look like this:
+NB. Once the data is uploaded to DynamoDB, the data is automatically tranformed by DynamoDB with a tagging strategy so it can manage and index data efficiently. The data will look like this:
 
 ```
 [ { "M" : { "measure_1" : { "S" : "400g" }, "ingredient_1" : { "S" : "Roasted Vegetables" } } }, { "M" : { "measure_2" : { "S" : "1 can " }, "ingredient_2" : { "S" : "Kidney Beans" } } }, { "M" : { "ingredient_3" : { "S" : "Chopped Tomatoes" }, "measure_3" : { "S" : "1 can " } } }, { "M" : { "measure_4" : { "S" : "1 Packet" }, "ingredient_4" : { "S" : "Mixed Grain" } } } ]
@@ -420,7 +420,7 @@ NB. Once the data is uploaded to DynamoDB, the data is automatically tranformed 
 
 - This repo is constructed, so minimal configuration for environment variables resides within app code. However, note that this is balanced with a need for a degree of validation for information which is processed by the application.
 
-- In the config file for `api_mapping` [here](./src/config/api_mapping.py), target apis are listed under `api_groups`. You can see that `api-groups` are mapped to scraping rules. Basically, the `default` app behaviour is to scrape from a single endpoint to fetch all records.
+- In the config file for `api_mapping` [here](./src/config/api_mapping.py), target APIs are listed under `api_groups`. You can see that `api_groups` are mapped to scraping rules. Basically, the `default` app behaviour is to scrape from a single endpoint to fetch all records.
 - However, that might not be possible for all endpoints. If the scraping rule is set to `alphabetical`, the app will loop through each letter of the alphabet and append the scraping rule `query` e.g. `"?f="`, to the api endpoint, followed by each letter. That will form endpoints in turn from which records can be scraped from.
 
 </details>
