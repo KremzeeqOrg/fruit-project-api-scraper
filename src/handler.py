@@ -1,9 +1,10 @@
+import logging
 from modules.orchestrator import Orchestrator
 
 # testing locally
 
-event = {"app": "fruit-project-api-scraper",
-         "sourceApiName": "fruity-vic"}
+# event = {"app": "fruit-project-api-scraper",
+#          "sourceApiName": "fruity-vice"}
 
 def main(event, context):
     try:
@@ -12,10 +13,10 @@ def main(event, context):
       orchestrator = Orchestrator(app, source_api_name)
       orchestrator.execute()
     except Exception as e:
-       print(f"{type(e).__name__} : {e}") 
+       logging.exception(e)
        exit(1)
 
 if __name__ == '__main__':
   #uncomment to test event payload locally
-  main(event, '')
-  # main('', '')
+  # main(event, '')
+  main('', '')
